@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Admin | bputnotes Dashboard{% endblock %}
+{% block content %}
+<h1 class="text-3xl font-bold">Admin overview</h1>
+<div class="mt-6 grid gap-4 md:grid-cols-3">
+    <div class="rounded-lg bg-white p-5 shadow-sm ring-1 ring-slate-200"><p class="text-sm text-slate-500">Total submissions</p><p class="mt-2 text-3xl font-bold">{{ total_submissions }}</p></div>
+    <div class="rounded-lg bg-white p-5 shadow-sm ring-1 ring-slate-200"><p class="text-sm text-slate-500">Pending queue</p><p class="mt-2 text-3xl font-bold text-amber-600">{{ pending_submissions }}</p></div>
+    <div class="rounded-lg bg-white p-5 shadow-sm ring-1 ring-slate-200"><p class="text-sm text-slate-500">Open tickets</p><p class="mt-2 text-3xl font-bold text-rose-600">{{ open_tickets }}</p></div>
+</div>
+<div class="mt-8 grid gap-6 xl:grid-cols-[420px_1fr]">
+    <section class="rounded-lg bg-white p-6 shadow-sm ring-1 ring-slate-200">
+        <h2 class="text-xl font-bold">Create account</h2>
+        <form method="post" class="mt-4 space-y-4">
+            {% csrf_token %}
+            {% include "dashboard/_form.html" with form=form %}
+            <button class="rounded-md bg-indigo-700 px-4 py-2 font-semibold text-white hover:bg-indigo-600">Create user</button>
+        </form>
+    </section>
+    <section class="rounded-lg bg-white p-6 shadow-sm ring-1 ring-slate-200">
+        <h2 class="text-xl font-bold">Monthly intern attendance</h2>
+        <div class="mt-4 overflow-x-auto">
+            <table class="min-w-full text-left text-sm">
+                <thead class="bg-slate-100 text-slate-600"><tr><th class="px-3 py-2">Intern</th><th class="px-3 py-2">Role</th><th class="px-3 py-2">Present days</th></tr></thead>
+                <tbody class="divide-y divide-slate-100">
+                    {% for intern in attendance %}
+                    <tr><td class="px-3 py-3 font-medium">{{ intern.username }}</td><td class="px-3 py-3">{{ intern.get_role_display }}</td><td class="px-3 py-3">{{ intern.present_days }}</td></tr>
+                    {% empty %}<tr><td class="px-3 py-3 text-slate-500" colspan="3">No interns yet.</td></tr>{% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>
+{% endblock %}

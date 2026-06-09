@@ -1,0 +1,38 @@
+<div class="mt-6 grid gap-6 xl:grid-cols-[420px_1fr]">
+    <section class="space-y-6">
+        <div class="rounded-lg bg-white p-6 shadow-sm ring-1 ring-slate-200">
+            <h2 class="text-xl font-bold">{{ submission_title }}</h2>
+            <form method="post" class="mt-4 space-y-4">
+                {% csrf_token %}
+                {% include "dashboard/_form.html" with form=submission_form %}
+                <button name="{{ submit_name }}" class="rounded-md bg-indigo-700 px-4 py-2 font-semibold text-white hover:bg-indigo-600">Submit</button>
+            </form>
+        </div>
+        <div class="rounded-lg bg-white p-6 shadow-sm ring-1 ring-slate-200">
+            <h2 class="text-xl font-bold">Raise support ticket</h2>
+            <form method="post" class="mt-4 space-y-4">
+                {% csrf_token %}
+                {% include "dashboard/_form.html" with form=ticket_form %}
+                <button name="raise_ticket" class="rounded-md bg-slate-900 px-4 py-2 font-semibold text-white hover:bg-slate-700">Raise ticket</button>
+            </form>
+        </div>
+    </section>
+    <section class="rounded-lg bg-white p-6 shadow-sm ring-1 ring-slate-200">
+        <h2 class="text-xl font-bold">{{ history_title }}</h2>
+        <div class="mt-4 overflow-x-auto">
+            <table class="min-w-full text-left text-sm">
+                <thead class="bg-slate-100 text-slate-600"><tr><th class="px-3 py-2">Item</th><th class="px-3 py-2">Status</th><th class="px-3 py-2">Remark</th><th class="px-3 py-2">Date</th></tr></thead>
+                <tbody class="divide-y divide-slate-100">
+                    {% for item in submissions %}
+                    <tr>
+                        <td class="px-3 py-3"><a href="{{ item.submission_link }}" target="_blank" rel="noopener" class="font-medium text-indigo-700 hover:underline">{{ item.subject_code_or_task_title }}</a></td>
+                        <td class="px-3 py-3"><span class="rounded-full bg-slate-100 px-2 py-1 text-xs font-bold">{{ item.get_status_display }}</span></td>
+                        <td class="px-3 py-3 text-slate-600">{{ item.supervisor_remark|default:"Awaiting review" }}</td>
+                        <td class="px-3 py-3 text-slate-500">{{ item.created_at|date:"M d, Y" }}</td>
+                    </tr>
+                    {% empty %}<tr><td class="px-3 py-3 text-slate-500" colspan="4">No submissions yet.</td></tr>{% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>

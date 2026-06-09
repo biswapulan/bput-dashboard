@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block title %}Tech Supervisor | bputnotes Dashboard{% endblock %}
+{% block content %}
+<h1 class="text-3xl font-bold">Tech supervisor panel</h1>
+{% include "dashboard/_supervisor.html" with link_label="View Repository" remark_placeholder="Code-review observations" %}
+{% endblock %}

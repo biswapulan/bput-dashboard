@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block title %}Content Intern | bputnotes Dashboard{% endblock %}
+{% block content %}
+<h1 class="text-3xl font-bold">Content intern panel</h1>
+{% include "dashboard/_intern.html" with submission_title="Submit study material" history_title="Submission tracking" submit_name="submit_content" %}
+{% endblock %}

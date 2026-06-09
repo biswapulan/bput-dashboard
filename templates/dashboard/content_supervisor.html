@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block title %}Content Supervisor | bputnotes Dashboard{% endblock %}
+{% block content %}
+<h1 class="text-3xl font-bold">Content supervisor panel</h1>
+{% include "dashboard/_supervisor.html" with link_label="Open Link" remark_placeholder="Evaluation remarks" %}
+{% endblock %}

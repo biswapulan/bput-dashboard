@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}bputnotes Dashboard{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        input, select, textarea {
+            width: 100%;
+            border: 1px solid rgb(203 213 225);
+            border-radius: 0.375rem;
+            padding: 0.5rem 0.75rem;
+            background: white;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: 2px solid rgb(99 102 241);
+            outline-offset: 1px;
+            border-color: rgb(99 102 241);
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-slate-50 text-slate-900">
+    <div class="flex min-h-screen">
+        <aside class="hidden w-72 border-r border-slate-200 bg-white px-6 py-7 lg:block">
+            <div class="text-2xl font-bold tracking-tight text-indigo-700">bputnotes.in</div>
+            <p class="mt-1 text-sm text-slate-500">Management Workspace</p>
+            {% if user.is_authenticated %}
+            <div class="mt-8 rounded-lg border border-slate-200 bg-slate-50 p-4">
+                <p class="text-sm font-semibold">{{ user.username }}</p>
+                <p class="mt-1 text-xs uppercase tracking-wide text-slate-500">{{ user.get_role_display }}</p>
+            </div>
+            <form method="post" action="{% url 'logout' %}" class="mt-6">
+                {% csrf_token %}
+                <button class="w-full rounded-md bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-700">Sign out</button>
+            </form>
+            {% endif %}
+        </aside>
+        <main class="flex-1 px-4 py-6 sm:px-8 lg:px-10">
+            {% if messages %}
+            <div class="mb-5 space-y-2">
+                {% for message in messages %}
+                <div class="rounded-md border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800">{{ message }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+</body>
+</html>
