@@ -427,11 +427,201 @@
             100% { transform: translateY(0); }
         }
 
+        /* =========================================
+           MOBILE: ACCESS DENIED SCREEN (≤640px)
+           Desktop styles above are completely untouched.
+        ========================================= */
+
+        /* Hide the login card on mobile */
         @media (max-width: 640px) {
-            .card { grid-template-columns: 1fr; min-height: auto; }
-            .left-panel { display: none; }
-            .right-panel { padding: 2.25rem 1.5rem; }
-            .rail-line-top, .cyber-train-top, .rail-line, .cyber-train { display: none; } 
+            .card { display: none; }
+        }
+
+        /* Mobile-only access denied overlay — hidden on desktop */
+        .mobile-block {
+            display: none;
+        }
+
+        @media (max-width: 640px) {
+            /* Re-enable train animations on mobile */
+            .rail-line-top,
+            .cyber-train-top,
+            .rail-line,
+            .cyber-train {
+                display: flex !important;
+            }
+
+            /* Reposition trains to frame the mobile block card */
+            .rail-line-top {
+                top: calc(50vh - 210px - 54px);
+            }
+            .cyber-train-top {
+                top: calc(50vh - 210px - 68.5px);
+            }
+            .rail-line {
+                bottom: calc(50vh - 210px - 54px);
+            }
+            .cyber-train {
+                bottom: calc(50vh - 210px - 68.5px);
+            }
+
+            /* Show the access denied card */
+            .mobile-block {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                text-align: center;
+                width: calc(100% - 2rem);
+                max-width: 340px;
+                background: #ffffff;
+                border: 1px solid #e2e8f0;
+                border-radius: 20px;
+                padding: 2.5rem 2rem;
+                position: relative;
+                z-index: 10;
+                box-shadow: 0 4px 6px -1px rgba(0,0,0,.04), 0 20px 60px -12px rgba(99,102,241,.12);
+            }
+
+            /* Shield / lock icon container */
+            .mobile-block-icon {
+                width: 72px;
+                height: 72px;
+                border-radius: 50%;
+                background: linear-gradient(135deg, #4f46e5 0%, #312e81 100%);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-bottom: 1.5rem;
+                box-shadow: 0 8px 24px rgba(79,70,229,.35);
+                flex-shrink: 0;
+            }
+
+            .mobile-block-badge {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.35rem;
+                background: #fef2f2;
+                border: 1px solid #fecaca;
+                border-radius: 999px;
+                padding: 0.3rem 0.85rem;
+                font-size: 0.65rem;
+                font-weight: 700;
+                color: #991b1b;
+                text-transform: uppercase;
+                letter-spacing: 0.1em;
+                margin-bottom: 1rem;
+            }
+
+            .mobile-block-badge-dot {
+                width: 6px;
+                height: 6px;
+                border-radius: 50%;
+                background: #ef4444;
+                flex-shrink: 0;
+                animation: mobilePulse 1.5s ease-in-out infinite;
+            }
+
+            .mobile-block h2 {
+                font-size: 1.45rem;
+                font-weight: 800;
+                color: #0f172a;
+                letter-spacing: -0.03em;
+                line-height: 1.25;
+                margin-bottom: 0.75rem;
+            }
+
+            .mobile-block p {
+                font-size: 0.82rem;
+                color: #64748b;
+                line-height: 1.55;
+                margin-bottom: 1.75rem;
+            }
+
+            /* Desktop illustration hint */
+            .mobile-block-devices {
+                display: flex;
+                align-items: flex-end;
+                justify-content: center;
+                gap: 0.75rem;
+                margin-bottom: 1.75rem;
+            }
+
+            /* Laptop shape */
+            .device-laptop {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 2px;
+            }
+            .device-laptop-screen {
+                width: 54px;
+                height: 36px;
+                border-radius: 4px 4px 0 0;
+                background: linear-gradient(135deg, #4f46e5, #818cf8);
+                border: 2px solid #312e81;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .device-laptop-base {
+                width: 64px;
+                height: 5px;
+                background: #cbd5e1;
+                border-radius: 0 0 3px 3px;
+            }
+
+            /* Monitor shape */
+            .device-monitor {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 2px;
+            }
+            .device-monitor-screen {
+                width: 62px;
+                height: 44px;
+                border-radius: 4px;
+                background: linear-gradient(135deg, #4f46e5, #818cf8);
+                border: 2px solid #312e81;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .device-monitor-stand {
+                width: 6px;
+                height: 10px;
+                background: #94a3b8;
+            }
+            .device-monitor-base {
+                width: 24px;
+                height: 4px;
+                background: #cbd5e1;
+                border-radius: 2px;
+            }
+
+            .device-screen-dot {
+                width: 8px;
+                height: 8px;
+                border-radius: 50%;
+                background: rgba(255,255,255,0.9);
+                box-shadow: 0 0 8px rgba(255,255,255,.7);
+            }
+
+            .mobile-block-footer {
+                font-size: 0.65rem;
+                color: #94a3b8;
+                letter-spacing: 0.04em;
+                border-top: 1px solid #f1f5f9;
+                padding-top: 1.25rem;
+                width: 100%;
+                text-align: center;
+            }
+
+            @keyframes mobilePulse {
+                0%, 100% { opacity: 1; transform: scale(1); }
+                50% { opacity: 0.4; transform: scale(0.8); }
+            }
         }
     </style>
 </head>
@@ -456,6 +646,66 @@
         </div>
     </div>
 
+    <!-- =============================================
+         MOBILE ACCESS DENIED BLOCK (hidden on desktop)
+    ============================================= -->
+    <div class="mobile-block" aria-label="Access restricted to desktop devices">
+
+        <!-- Brand lockup -->
+        <div style="display:flex;align-items:center;gap:.65rem;margin-bottom:1.75rem;">
+            <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:36px;height:36px;border-radius:8px;flex-shrink:0;box-shadow:0 2px 12px rgba(37,99,235,.25);">
+              <rect width="64" height="64" rx="16" fill="#2563eb"/>
+              <path d="M18 46V18h15c3.5 0 6.2.9 8 2.7 1.8 1.7 2.7 3.8 2.7 6.3 0 1.7-.5 3.2-1.5 4.4-.9 1.1-2 1.8-3.2 2.2 1.7.3 3 1.2 4 2.5 1 1.3 1.5 2.9 1.5 4.8 0 2.9-1 5.1-3 6.7-2 1.6-4.8 2.4-8.5 2.4H18zm6.2-17h8.3c1.9 0 3.3-.5 4.2-1.3.9-.8 1.4-1.9 1.4-3.2 0-1.4-.5-2.5-1.4-3.2-.9-.8-2.3-1.2-4.1-1.2h-8.4v8.9zm0 12h9.2c2 0 3.5-.5 4.5-1.5 1-.9 1.5-2.2 1.5-3.7s-.5-2.8-1.5-3.7c-1-1-2.5-1.4-4.5-1.4h-9.2v10.3z" fill="white"/>
+            </svg>
+            <div>
+                <div style="font-size:1.05rem;font-weight:800;color:#0f172a;letter-spacing:-.025em;">bputnotes.in</div>
+                <div style="font-size:.6rem;color:#475569;font-weight:600;text-transform:uppercase;letter-spacing:.1em;margin-top:.1rem;">Management Workspace</div>
+            </div>
+        </div>
+
+        <div class="mobile-block-icon">
+            <!-- Lock icon -->
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+        </div>
+
+        <div class="mobile-block-badge">
+            <span class="mobile-block-badge-dot"></span>
+            Access Denied
+        </div>
+
+        <h2>Desktop &amp;<br>Laptop Only</h2>
+
+        <p>This workspace is restricted to desktop and laptop devices. Please switch to a laptop or desktop computer to sign in.</p>
+
+        <div class="mobile-block-devices">
+            <!-- Laptop -->
+            <div class="device-laptop">
+                <div class="device-laptop-screen">
+                    <div class="device-screen-dot"></div>
+                </div>
+                <div class="device-laptop-base"></div>
+            </div>
+            <!-- Monitor -->
+            <div class="device-monitor">
+                <div class="device-monitor-screen">
+                    <div class="device-screen-dot"></div>
+                </div>
+                <div class="device-monitor-stand"></div>
+                <div class="device-monitor-base"></div>
+            </div>
+        </div>
+
+        <div class="mobile-block-footer">
+            bputnotes.in &mdash; Authorised Personnel Only
+        </div>
+    </div>
+
+    <!-- =============================================
+         LOGIN CARD (hidden on mobile via CSS)
+    ============================================= -->
     <div class="card">
         <div class="left-panel">
             <div class="glow-orb-1"></div>
