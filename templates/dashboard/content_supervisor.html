@@ -1,6 +1,12 @@
 {% extends "base.html" %}
 {% block title %}Content Supervisor | bputnotes Dashboard{% endblock %}
 {% block content %}
-<h1 class="text-3xl font-bold">Content supervisor panel</h1>
-{% include "dashboard/_supervisor.html" with link_label="Open Link" remark_placeholder="Evaluation remarks" %}
+<div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:2rem; flex-wrap:wrap; gap:1rem;">
+    <div>
+        <h1 style="font-size:1.5rem; font-weight:800; color:#0f172a; letter-spacing:-.02em;">Content Supervisor Panel</h1>
+        <p style="font-size:.82rem; color:#475569; margin-top:.2rem;">Review and manage content intern submissions</p>
+    </div>
+    <span style="background:#0c1e3a; color:#38bdf8; border:1px solid #0369a1; font-size:.72rem; font-weight:700; padding:.35rem .85rem; border-radius:9999px; letter-spacing:.06em; text-transform:uppercase;">Content Supervisor</span>
+</div>
+{% include "dashboard/_supervisor.html" with link_label="Open Link" remark_placeholder="Evaluation remarks (optional)..." %}
 {% endblock %}

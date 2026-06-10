@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}User Management{% endblock %}
+{% block nav_user_mgmt %}active{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1> User Management</h1>
+        <p>All accounts in the system</p>
+    </div>
+    <a href="{% url 'create-intern' %}" class="btn btn-primary btn-sm">+ Create Intern</a>
+</div>
+<div class="card">
+    <div style="overflow-x:auto;">
+        <table class="data-table">
+            <thead>
+                <tr><th>Name / Username</th><th>Intern ID</th><th>Role</th><th>Department</th><th>College</th><th>Joined</th><th>Action</th></tr>
+            </thead>
+            <tbody>
+                {% for u in users %}
+                <tr>
+                    <td>
+                        <span style="font-weight:600; color:#0f172a; font-size:.88rem;">{{ u.get_full_name|default:u.username }}</span>
+                        {% if u.get_full_name %}<br><span style="font-size:.72rem; color:#64748b;">@{{ u.username }}</span>{% endif %}
+                    </td>
+                    <td style="font-family:monospace; color:#4f46e5; font-size:.78rem;">{{ u.intern_id|default:"—" }}</td>
+                    <td><span class="badge badge-pending" style="background:#eef2ff; color:#4f46e5; border-color:#3730a3;">{{ u.get_role_display }}</span></td>
+                    <td style="font-size:.8rem; color:#64748b;">{{ u.get_department_display|default:"—" }}</td>
+                    <td style="font-size:.8rem; color:#64748b;">{{ u.college_name|default:"—" }}</td>
+                    <td style="font-size:.75rem; color:#64748b; white-space:nowrap;">{{ u.date_of_joining|date:"M d, Y" }}</td>
+                    <td>
+                        {% if u.pk != request.user.pk %}
+                        <form method="post" action="{% url 'delete-user' u.pk %}" onsubmit="return confirm('Delete {{ u.username }}?');">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                        </form>
+                        {% else %}<span style="font-size:.72rem; color:#334155;">You</span>{% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,6 +1,15 @@
 {% extends "base.html" %}
 {% block title %}Tech Intern | bputnotes Dashboard{% endblock %}
 {% block content %}
-<h1 class="text-3xl font-bold">Tech intern panel</h1>
-{% include "dashboard/_intern.html" with submission_title="Submit code work" history_title="Code iteration tracking" submit_name="submit_tech" %}
+<div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:2rem; flex-wrap:wrap; gap:1rem;">
+    <div>
+        <h1 style="font-size:1.5rem; font-weight:800; color:#0f172a; letter-spacing:-.02em;">Tech Intern Panel</h1>
+        <p style="font-size:.82rem; color:#475569; margin-top:.2rem;">
+            Welcome, <strong style="color:#059669;">{{ user.get_full_name|default:user.username }}</strong>
+            {% if user.intern_id %} · <span style="font-family:monospace; color:#059669;">{{ user.intern_id }}</span>{% endif %}
+        </p>
+    </div>
+    <span style="background:#0d1f0f; color:#059669; border:1px solid #065f46; font-size:.72rem; font-weight:700; padding:.35rem .85rem; border-radius:9999px; letter-spacing:.06em; text-transform:uppercase;">Tech Intern</span>
+</div>
+{% include "dashboard/_intern.html" with submission_title="Submit Tech Work" history_title="Submission Tracking" submit_name="submit_tech" %}
 {% endblock %}

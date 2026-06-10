@@ -1,0 +1,205 @@
+{% extends "base.html" %}
+{% block title %}Supervisor Dashboard{% endblock %}
+{% block nav_sv_dashboard %}active{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1> Supervisor Dashboard</h1>
+        <p>{{ dept|title }} Department — manage tasks and tickets</p>
+    </div>
+    <a href="{% url 'assign-task' %}" class="btn btn-primary btn-sm">+ Assign Task</a>
+</div>
+
+<!-- Tabs -->
+<div style="display:flex; gap:.6rem; margin-bottom:1.75rem; border:1px solid #e2e8f0; padding-bottom:1rem; flex-wrap:wrap;">
+    <button class="tab-btn active" data-tab="tasks"> Active Tasks ({{ tasks|length }})</button>
+    <button class="tab-btn" data-tab="interns"> My Interns ({{ interns|length }})</button>
+    <button class="tab-btn" data-tab="tickets"> Open Tickets ({{ tickets|length }})</button>
+</div>
+
+<!-- Tasks Tab -->
+<div id="sv-tab-tasks">
+    {% if tasks %}
+    <div style="display:flex; flex-direction:column; gap:1.25rem;">
+        {% for task in tasks %}
+        <div class="card" style="border-left:3px solid {% if task.status == 'SUBMITTED' %}#6366f1{% else %}#fbbf24{% endif %};">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:.75rem;">
+                <div style="flex:1; min-width:0;">
+                    <div style="display:flex; align-items:center; gap:.75rem; flex-wrap:wrap; margin-bottom:.4rem;">
+                        <span style="font-family:monospace; font-size:.82rem; font-weight:700; color:#4f46e5;">{{ task.task_id }}</span>
+                        {% if task.status == "SUBMITTED" %}
+                        <span class="badge badge-submitted">SUBMITTED — Awaiting Review</span>
+                        {% else %}
+                        <span class="badge badge-pending">PENDING</span>
+                        {% endif %}
+                    </div>
+                    <p style="font-size:1rem; font-weight:700; color:#0f172a; margin-bottom:.3rem;">{{ task.title }}</p>
+                    {% if task.description %}<p style="font-size:.82rem; color:#64748b; margin-bottom:.4rem;">{{ task.description }}</p>{% endif %}
+                    <div style="display:flex; gap:1.5rem; font-size:.78rem; color:#475569; flex-wrap:wrap;">
+                        <span> <strong style="color:#334155;">{{ task.assigned_to.get_full_name|default:task.assigned_to.username }}</strong></span>
+                        <span style="color:#4f46e5; font-family:monospace;">{{ task.assigned_to.intern_id|default:"—" }}</span>
+                        <span> {{ task.created_at|date:"M d, Y" }}</span>
+                    </div>
+                    {% if task.task_link %}
+                    <a href="{{ task.task_link }}" target="_blank" rel="noopener" class="btn btn-outline btn-sm" style="margin-top:.75rem; display:inline-block; text-decoration:none;">View Task File ↗</a>
+                    {% endif %}
+                    {% if task.rejection_remark %}
+                    <div style="margin-top:.6rem; background:#fff1f2; border:1px solid #7f1d1d; border-radius:.4rem; padding:.5rem .75rem;">
+                        <span style="font-size:.72rem; color:#e11d48; font-weight:700;">REJECTION REMARK:</span>
+                        <p style="font-size:.8rem; color:#9f1239; margin-top:.2rem;">{{ task.rejection_remark }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+
+                {% if task.status == "SUBMITTED" %}
+                <div style="display:flex; flex-direction:column; gap:.6rem; min-width:240px;">
+                    {% with task.submission as sub %}
+                    {% if sub %}
+                    <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:.5rem; padding:.85rem;">
+                        <p style="font-size:.72rem; color:#64748b; font-weight:700; text-transform:uppercase; letter-spacing:.07em; margin-bottom:.35rem;">Submission</p>
+                        <p style="font-family:monospace; font-size:.78rem; color:#4f46e5; margin-bottom:.4rem;">{{ sub.token_id }}</p>
+                        <a href="{{ sub.submission_link }}" target="_blank" rel="noopener" style="color:#059669; font-size:.82rem; word-break:break-all;">{{ sub.submission_link|truncatechars:50 }} ↗</a>
+                        {% if sub.note %}<p style="font-size:.78rem; color:#64748b; margin-top:.35rem;">Note: {{ sub.note }}</p>{% endif %}
+                    </div>
+                    {% endif %}
+                    {% endwith %}
+                    <form method="post" action="{% url 'review-task' task.task_id 'approve' %}">
+                        {% csrf_token %}
+                        <textarea name="remark" rows="2" placeholder="Optional remark…" style="font-size:.82rem; margin-bottom:.5rem;"></textarea>
+                        <button type="submit" class="btn btn-success" style="width:100%;"> Accept</button>
+                    </form>
+                    <form method="post" action="{% url 'review-task' task.task_id 'reject' %}">
+                        {% csrf_token %}
+                        <textarea name="remark" rows="2" placeholder="Rejection reason (required)…" style="font-size:.82rem; margin-bottom:.5rem;"></textarea>
+                        <button type="submit" class="btn btn-danger" style="width:100%;"> Reject</button>
+                    </form>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div style="text-align:center; padding:4rem 2rem; color:#334155;">
+        <p style="font-size:2.5rem;"></p>
+        <p style="font-size:1rem; font-weight:600; color:#475569; margin-top:.5rem;">No active tasks</p>
+        <p style="font-size:.82rem; margin-top:.25rem;">Assign tasks to your interns to get started.</p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Interns Tab -->
+<div id="sv-tab-interns" style="display:none;">
+    {% if interns %}
+    <!-- Summary row -->
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:1rem; margin-bottom:1.5rem;">
+        <div class="stat-card">
+            <p style="font-size:.72rem; color:#64748b; font-weight:700; text-transform:uppercase; letter-spacing:.07em;">Total Interns</p>
+            <p style="font-size:2rem; font-weight:800; color:#4f46e5; margin-top:.25rem;">{{ interns|length }}</p>
+        </div>
+        <div class="stat-card">
+            <p style="font-size:.72rem; color:#64748b; font-weight:700; text-transform:uppercase; letter-spacing:.07em;">Total Tasks Assigned</p>
+            <p style="font-size:2rem; font-weight:800; color:#059669; margin-top:.25rem;">{{ tasks|length }}</p>
+        </div>
+    </div>
+
+    <div style="overflow-x:auto;">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Intern</th>
+                    <th>Intern ID</th>
+                    <th>College</th>
+                    <th>Year</th>
+                    <th>Joined</th>
+                    <th>Tasks</th>
+                    <th>Pending</th>
+                    <th>Days Present (This Month)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for intern in interns %}
+                <tr>
+                    <td>
+                        <div style="font-weight:600; color:#0f172a;">{{ intern.get_full_name|default:intern.username }}</div>
+                        <div style="font-size:.72rem; color:#475569;">{{ intern.username }}</div>
+                    </td>
+                    <td style="font-family:monospace; color:#4f46e5; font-size:.8rem;">{{ intern.intern_id|default:"—" }}</td>
+                    <td style="color:#94a3b8; font-size:.82rem;">{{ intern.college_name|default:"—" }}</td>
+                    <td style="color:#94a3b8; font-size:.82rem;">{{ intern.get_year_display|default:"—" }}</td>
+                    <td style="color:#64748b; font-size:.8rem; white-space:nowrap;">{{ intern.date_of_joining|date:"M d, Y" }}</td>
+                    <td>
+                        <span style="font-weight:700; color:#334155;">{{ intern.task_count }}</span>
+                    </td>
+                    <td>
+                        {% if intern.pending_count > 0 %}
+                        <span class="badge badge-pending">{{ intern.pending_count }}</span>
+                        {% else %}
+                        <span style="color:#334155; font-size:.8rem;">—</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span style="font-weight:700; color:{% if intern.present_this_month > 15 %}#34d399{% elif intern.present_this_month > 5 %}#fbbf24{% else %}#f87171{% endif %};">
+                            {{ intern.present_this_month }}
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div style="text-align:center; padding:4rem 2rem; color:#334155;">
+        <p style="font-size:2.5rem;"></p>
+        <p style="font-size:1rem; font-weight:600; color:#475569; margin-top:.5rem;">No interns in your department yet</p>
+        <p style="font-size:.82rem; margin-top:.25rem;">Contact admin to create intern accounts for your department.</p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Tickets Tab -->
+<div id="sv-tab-tickets" style="display:none;">
+    {% if tickets %}
+    <div style="display:flex; flex-direction:column; gap:1.25rem;">
+        {% for ticket in tickets %}
+        <div class="card" style="border-left:3px solid #f87171;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:.75rem;">
+                <div>
+                    <span style="font-family:monospace; font-size:.82rem; font-weight:700; color:#e11d48;">{{ ticket.token_id }}</span>
+                    <p style="font-size:1rem; font-weight:700; color:#0f172a; margin-top:.3rem;">{{ ticket.subject }}</p>
+                    <p style="font-size:.85rem; color:#64748b; margin-top:.3rem;">{{ ticket.description }}</p>
+                    <div style="display:flex; gap:1.5rem; margin-top:.5rem; font-size:.78rem; color:#475569;">
+                        <span> {{ ticket.raised_by.get_full_name|default:ticket.raised_by.username }}</span>
+                        <span style="color:#4f46e5; font-family:monospace;">{{ ticket.raised_by.intern_id|default:"—" }}</span>
+                        <span> {{ ticket.created_at|date:"M d, Y" }}</span>
+                    </div>
+                </div>
+                <form method="post" action="{% url 'resolve-ticket' ticket.token_id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-success btn-sm">Mark Resolved</button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div style="text-align:center; padding:4rem 2rem; color:#334155;">
+        <p style="font-size:2.5rem;"></p>
+        <p style="font-size:1rem; font-weight:600; color:#475569; margin-top:.5rem;">No open tickets</p>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+    document.querySelectorAll('.tab-btn[data-tab]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.tab-btn[data-tab]').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const t = btn.getAttribute('data-tab');
+            ['tasks','interns','tickets'].forEach(name => {
+                document.getElementById('sv-tab-'+name).style.display = name===t?'':'none';
+            });
+        });
+    });
+</script>
+{% endblock %}

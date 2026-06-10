@@ -131,6 +131,7 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 AUTH_USER_MODEL = 'dashboard.CustomUser'
+AUTHENTICATION_BACKENDS = ['dashboard.auth_backends.InternIdOrUsernameBackend']
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'dashboard-home'
 LOGOUT_REDIRECT_URL = 'login'

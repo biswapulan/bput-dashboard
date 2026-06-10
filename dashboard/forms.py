@@ -1,7 +1,11 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import AuthenticationForm, UserChangeForm, UserCreationForm
 
-from .models import CustomUser, Submission, Ticket
+from .models import Announcement, AssignedTask, CustomUser, Submission, Ticket
+
+
+class DashboardAuthenticationForm(AuthenticationForm):
+    username = forms.CharField(label="Username or Intern ID")
 
 
 class DashboardUserCreationForm(UserCreationForm):
@@ -9,62 +13,91 @@ class DashboardUserCreationForm(UserCreationForm):
 
     class Meta:
         model = CustomUser
-        fields = ("username", "email", "role", "password1", "password2")
+        fields = (
+            "username",
+            "email",
+            "first_name",
+            "last_name",
+            "college_name",
+            "department",
+            "year",
+            "role",
+            "password1",
+            "password2",
+        )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["role"].choices = [
+            (CustomUser.Role.CONTENT_INTERN, "Content Intern"),
+            (CustomUser.Role.TECH_INTERN, "Tech Intern"),
+        ]
+
+    def clean(self):
+        cleaned_data = super().clean()
+        role = cleaned_data.get("role")
+        department = cleaned_data.get("department")
+        if role == CustomUser.Role.CONTENT_INTERN and department != CustomUser.Department.CONTENT:
+            self.add_error("department", "Content interns must be in the Content department.")
+        if role == CustomUser.Role.TECH_INTERN and department != CustomUser.Department.TECH:
+            self.add_error("department", "Tech interns must be in the Tech department.")
+        return cleaned_data
 
 
-class ContentSubmissionForm(forms.ModelForm):
+class ProfileUpdateForm(UserChangeForm):
+    password = None
+
+    class Meta:
+        model = CustomUser
+        fields = ("email",)
+
+
+class AssignTaskForm(forms.ModelForm):
+    intern_id = forms.CharField(
+        max_length=40,
+        label="Intern ID",
+        help_text="Enter the intern's ID to assign the task",
+    )
+
+    class Meta:
+        model = AssignedTask
+        fields = ("title", "description", "task_link")
+        widgets = {
+            "description": forms.Textarea(attrs={"rows": 3}),
+        }
+        help_texts = {
+            "description": "Brief description (keep it short to save storage)",
+            "task_link": "Link to detailed task file (any URL)",
+        }
+
+    def clean_intern_id(self):
+        intern_id = self.cleaned_data["intern_id"].strip()
+        try:
+            user = CustomUser.objects.get(intern_id=intern_id)
+        except CustomUser.DoesNotExist:
+            raise forms.ValidationError("No intern found with this ID.")
+        return intern_id
+
+
+class SubmitTaskForm(forms.ModelForm):
     class Meta:
         model = Submission
-        fields = ("semester", "material_type", "subject_code_or_task_title", "submission_link")
+        fields = ("submission_link", "note")
         labels = {
-            "subject_code_or_task_title": "Subject code",
-            "submission_link": "Cloud storage URL",
+            "submission_link": "Submission Link",
+            "note": "Note to supervisor (optional)",
+        }
+        widgets = {
+            "note": forms.Textarea(attrs={"rows": 3}),
         }
 
-    def clean_material_type(self):
-        material_type = self.cleaned_data["material_type"]
-        allowed = {
-            Submission.MaterialType.NOTES,
-            Submission.MaterialType.PYQ,
-            Submission.MaterialType.BOOK,
-        }
-        if material_type not in allowed:
-            raise forms.ValidationError("Content submissions must be Notes, PYQ, or Book material.")
-        return material_type
 
-    def clean_submission_link(self):
-        link = self.cleaned_data["submission_link"]
-        allowed_domains = ("drive.google.com", "docs.google.com", "onedrive.live.com", "dropbox.com")
-        if not any(domain in link.lower() for domain in allowed_domains):
-            raise forms.ValidationError("Use a shared cloud storage link such as Google Drive.")
-        return link
-
-
-class TechSubmissionForm(forms.ModelForm):
-    class Meta:
-        model = Submission
-        fields = ("material_type", "subject_code_or_task_title", "submission_link")
-        labels = {
-            "subject_code_or_task_title": "Task title or description",
-            "submission_link": "GitHub repository or pull request URL",
-        }
-
-    def clean_material_type(self):
-        material_type = self.cleaned_data["material_type"]
-        allowed = {Submission.MaterialType.CODE_FIX, Submission.MaterialType.FEATURE_DEV}
-        if material_type not in allowed:
-            raise forms.ValidationError("Tech submissions must be Code Fix or Feature Development.")
-        return material_type
-
-    def clean_submission_link(self):
-        link = self.cleaned_data["submission_link"]
-        if "github.com" not in link.lower():
-            raise forms.ValidationError("Use a valid GitHub repository or pull request URL.")
-        return link
-
-
-class ReviewSubmissionForm(forms.Form):
-    remark = forms.CharField(widget=forms.Textarea(attrs={"rows": 3}), required=False)
+class ReviewTaskForm(forms.Form):
+    remark = forms.CharField(
+        widget=forms.Textarea(attrs={"rows": 3}),
+        required=False,
+        label="Remark (required on rejection)",
+    )
 
 
 class TicketForm(forms.ModelForm):
@@ -73,4 +106,13 @@ class TicketForm(forms.ModelForm):
         fields = ("subject", "description")
         widgets = {
             "description": forms.Textarea(attrs={"rows": 4}),
+        }
+
+
+class AnnouncementForm(forms.ModelForm):
+    class Meta:
+        model = Announcement
+        fields = ("title", "body")
+        widgets = {
+            "body": forms.Textarea(attrs={"rows": 5}),
         }

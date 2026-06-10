@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% block title %}Attendance{% endblock %}
+{% block nav_attendance %}active{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1> Attendance Log</h1>
+        <p>Daily login records for all interns</p>
+    </div>
+</div>
+
+<!-- Summary Stats -->
+<div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:1rem; margin-bottom:1.75rem;">
+    <div class="stat-card">
+        <p style="font-size:.72rem; color:#64748b; font-weight:700; text-transform:uppercase; letter-spacing:.07em;">Total Interns</p>
+        <p style="font-size:2rem; font-weight:800; color:#4f46e5; margin-top:.25rem;">{{ total_interns }}</p>
+    </div>
+    <div class="stat-card">
+        <p style="font-size:.72rem; color:#64748b; font-weight:700; text-transform:uppercase; letter-spacing:.07em;">Present Today</p>
+        <p style="font-size:2rem; font-weight:800; color:#059669; margin-top:.25rem;">{{ present_today }}</p>
+        <p style="font-size:.7rem; color:#334155; margin-top:.1rem;">{{ today|date:"M d, Y" }}</p>
+    </div>
+    <div class="stat-card">
+        <p style="font-size:.72rem; color:#64748b; font-weight:700; text-transform:uppercase; letter-spacing:.07em;">Active This Month</p>
+        <p style="font-size:2rem; font-weight:800; color:#d97706; margin-top:.25rem;">{{ present_this_month }}</p>
+        <p style="font-size:.7rem; color:#334155; margin-top:.1rem;">{{ today|date:"F Y" }}</p>
+    </div>
+    <div class="stat-card">
+        <p style="font-size:.72rem; color:#64748b; font-weight:700; text-transform:uppercase; letter-spacing:.07em;">Absent Today</p>
+        <p style="font-size:2rem; font-weight:800; color:#e11d48; margin-top:.25rem;">{{ total_interns|add:"-"|add:present_today }}</p>
+        {% with absent=total_interns|add:"-1" %}{% endwith %}
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="card" style="margin-bottom:1.25rem;">
+    <form method="get" style="display:flex; gap:1rem; flex-wrap:wrap; align-items:flex-end;">
+        <div style="flex:1; min-width:140px;">
+            <label style="display:block; margin-bottom:.4rem;">Filter by Date</label>
+            <input type="date" name="date" value="{{ filter_date }}" style="width:100%;">
+        </div>
+        <div style="flex:1; min-width:140px;">
+            <label style="display:block; margin-bottom:.4rem;">Department</label>
+            <select name="dept" style="width:100%;">
+                <option value="">All Departments</option>
+                <option value="CONTENT" {% if filter_dept == "CONTENT" %}selected{% endif %}>Content</option>
+                <option value="TECH" {% if filter_dept == "TECH" %}selected{% endif %}>Tech</option>
+            </select>
+        </div>
+        <div style="flex:2; min-width:160px;">
+            <label style="display:block; margin-bottom:.4rem;">Search Intern</label>
+            <input type="text" name="intern" value="{{ filter_intern }}" placeholder="Name, username or Intern ID…">
+        </div>
+        <div style="display:flex; gap:.5rem; flex-shrink:0;">
+            <button type="submit" class="btn btn-primary btn-sm">Apply</button>
+            <a href="{% url 'admin-attendance' %}" class="btn btn-outline btn-sm" style="text-decoration:none;">Reset</a>
+        </div>
+    </form>
+</div>
+
+<!-- Table -->
+<div class="card">
+    {% if filter_date or filter_dept or filter_intern %}
+    <p style="font-size:.78rem; color:#475569; margin-bottom:1rem;">
+        Showing {{ logs|length }} record{{ logs|length|pluralize }} 
+        {% if filter_date %}for <strong style="color:#4f46e5;">{{ filter_date }}</strong>{% endif %}
+        {% if filter_dept %}in <strong style="color:#4f46e5;">{{ filter_dept|title }}</strong> dept{% endif %}
+        {% if filter_intern %}matching <strong style="color:#4f46e5;">"{{ filter_intern }}"</strong>{% endif %}
+    </p>
+    {% endif %}
+    <div style="overflow-x:auto;">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Intern</th>
+                    <th>Intern ID</th>
+                    <th>Department</th>
+                    <th>College</th>
+                    <th>First Login</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in logs %}
+                <tr>
+                    <td style="color:#4f46e5; font-weight:600; font-size:.82rem; white-space:nowrap;">{{ log.login_date|date:"M d, Y" }}</td>
+                    <td>
+                        <div style="font-weight:500; color:#0f172a;">{{ log.user.get_full_name|default:log.user.username }}</div>
+                        <div style="font-size:.72rem; color:#475569;">{{ log.user.username }}</div>
+                    </td>
+                    <td style="font-family:monospace; color:#4f46e5; font-size:.78rem;">{{ log.user.intern_id|default:"—" }}</td>
+                    <td>
+                        {% if log.user.department == "CONTENT" %}
+                        <span class="badge" style="background:#eef2ff; color:#4f46e5; border:1px solid #3730a3;">Content</span>
+                        {% elif log.user.department == "TECH" %}
+                        <span class="badge" style="background:#f0fdf4; color:#059669; border:1px solid #065f46;">Tech</span>
+                        {% else %}
+                        <span style="color:#334155;">—</span>
+                        {% endif %}
+                    </td>
+                    <td style="font-size:.8rem; color:#64748b;">{{ log.user.college_name|default:"—"|truncatechars:30 }}</td>
+                    <td style="font-size:.8rem; color:#64748b; white-space:nowrap; font-family:monospace;">{{ log.first_login_time|date:"H:i:s" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" style="text-align:center; color:#334155; font-style:italic; padding:3rem;">
+                        {% if filter_date or filter_dept or filter_intern %}
+                        No records match your filters.
+                        {% else %}
+                        No attendance records yet.
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

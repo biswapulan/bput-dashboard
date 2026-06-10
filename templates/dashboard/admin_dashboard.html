@@ -1,33 +1,64 @@
 {% extends "base.html" %}
-{% block title %}Admin | bputnotes Dashboard{% endblock %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block nav_admin_dashboard %}active{% endblock %}
 {% block content %}
-<h1 class="text-3xl font-bold">Admin overview</h1>
-<div class="mt-6 grid gap-4 md:grid-cols-3">
-    <div class="rounded-lg bg-white p-5 shadow-sm ring-1 ring-slate-200"><p class="text-sm text-slate-500">Total submissions</p><p class="mt-2 text-3xl font-bold">{{ total_submissions }}</p></div>
-    <div class="rounded-lg bg-white p-5 shadow-sm ring-1 ring-slate-200"><p class="text-sm text-slate-500">Pending queue</p><p class="mt-2 text-3xl font-bold text-amber-600">{{ pending_submissions }}</p></div>
-    <div class="rounded-lg bg-white p-5 shadow-sm ring-1 ring-slate-200"><p class="text-sm text-slate-500">Open tickets</p><p class="mt-2 text-3xl font-bold text-rose-600">{{ open_tickets }}</p></div>
+<div class="page-header">
+    <div>
+        <h1> Admin Dashboard</h1>
+        <p>System overview — BPUT Notes Intern Management</p>
+    </div>
 </div>
-<div class="mt-8 grid gap-6 xl:grid-cols-[420px_1fr]">
-    <section class="rounded-lg bg-white p-6 shadow-sm ring-1 ring-slate-200">
-        <h2 class="text-xl font-bold">Create account</h2>
-        <form method="post" class="mt-4 space-y-4">
-            {% csrf_token %}
-            {% include "dashboard/_form.html" with form=form %}
-            <button class="rounded-md bg-indigo-700 px-4 py-2 font-semibold text-white hover:bg-indigo-600">Create user</button>
-        </form>
-    </section>
-    <section class="rounded-lg bg-white p-6 shadow-sm ring-1 ring-slate-200">
-        <h2 class="text-xl font-bold">Monthly intern attendance</h2>
-        <div class="mt-4 overflow-x-auto">
-            <table class="min-w-full text-left text-sm">
-                <thead class="bg-slate-100 text-slate-600"><tr><th class="px-3 py-2">Intern</th><th class="px-3 py-2">Role</th><th class="px-3 py-2">Present days</th></tr></thead>
-                <tbody class="divide-y divide-slate-100">
-                    {% for intern in attendance %}
-                    <tr><td class="px-3 py-3 font-medium">{{ intern.username }}</td><td class="px-3 py-3">{{ intern.get_role_display }}</td><td class="px-3 py-3">{{ intern.present_days }}</td></tr>
-                    {% empty %}<tr><td class="px-3 py-3 text-slate-500" colspan="3">No interns yet.</td></tr>{% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </section>
+
+<!-- Stat Cards -->
+<div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:1rem; margin-bottom:1.75rem;">
+    <div class="stat-card">
+        <p style="font-size:.72rem; color:#64748b; font-weight:600; text-transform:uppercase; letter-spacing:.07em;">Total Interns</p>
+        <p style="font-size:2rem; font-weight:800; color:#4f46e5; margin-top:.25rem;">{{ total_interns }}</p>
+    </div>
+    <div class="stat-card">
+        <p style="font-size:.72rem; color:#64748b; font-weight:600; text-transform:uppercase; letter-spacing:.07em;">Total Tasks</p>
+        <p style="font-size:2rem; font-weight:800; color:#059669; margin-top:.25rem;">{{ total_tasks }}</p>
+    </div>
+    <div class="stat-card">
+        <p style="font-size:.72rem; color:#64748b; font-weight:600; text-transform:uppercase; letter-spacing:.07em;">Pending Tasks</p>
+        <p style="font-size:2rem; font-weight:800; color:#d97706; margin-top:.25rem;">{{ pending_tasks }}</p>
+    </div>
+    <div class="stat-card">
+        <p style="font-size:.72rem; color:#64748b; font-weight:600; text-transform:uppercase; letter-spacing:.07em;">Open Tickets</p>
+        <p style="font-size:2rem; font-weight:800; color:#e11d48; margin-top:.25rem;">{{ open_tickets }}</p>
+    </div>
+</div>
+
+<!-- Attendance Table -->
+<div class="card">
+    <h2 class="section-title"> Intern Attendance — This Month</h2>
+    <div style="overflow-x:auto;">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Intern</th>
+                    <th>Intern ID</th>
+                    <th>Department</th>
+                    <th>College</th>
+                    <th>Days Present</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for intern in attendance %}
+                <tr>
+                    <td style="font-weight:600; color:#0f172a;">{{ intern.get_full_name|default:intern.username }}</td>
+                    <td style="font-family:monospace; color:#4f46e5; font-size:.78rem;">{{ intern.intern_id|default:"—" }}</td>
+                    <td style="font-size:.8rem; color:#64748b;">{{ intern.get_department_display|default:"—" }}</td>
+                    <td style="font-size:.8rem; color:#64748b;">{{ intern.college_name|default:"—" }}</td>
+                    <td>
+                        <span style="background:#f1f5f9; color:#94a3b8; padding:.2rem .6rem; border-radius:.3rem; font-size:.82rem; font-weight:600;">{{ intern.present_days }}</span>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5" style="text-align:center; color:#334155; font-style:italic; padding:2rem;">No interns found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 {% endblock %}

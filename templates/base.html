@@ -4,48 +4,381 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}bputnotes Dashboard{% endblock %}</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        input, select, textarea {
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { height: 100%; font-family: 'Inter', system-ui, sans-serif; color: #0f172a; background: #f8fafc; }
+        #app-shell { display: flex; height: 100vh; overflow: hidden; }
+
+        /* ── SIDEBAR ── */
+        #sidebar {
+            width: 248px;
+            flex-shrink: 0;
+            background: #ffffff;
+            border-right: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            position: sticky;
+            top: 0;
+        }
+        #sidebar-brand {
+            padding: 1.1rem 1.25rem .95rem;
+            border-bottom: 1px solid #f1f5f9;
+            flex-shrink: 0;
+        }
+        .brand-lockup { display: flex; align-items: center; gap: .65rem; }
+        .brand-lockup svg { flex-shrink: 0; width: 34px; height: 34px; border-radius: 8px; }
+        .brand-text { min-width: 0; }
+        .brand-logo { font-size: 1rem; font-weight: 800; color: #4f46e5; letter-spacing: -.03em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .brand-sub { font-size: .59rem; color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: .1em; margin-top: .1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        #sidebar nav { padding: .75rem .7rem; flex: 1; overflow-y: auto; }
+        #sidebar nav::-webkit-scrollbar { width: 3px; }
+        #sidebar nav::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 3px; }
+        .nav-section {
+            font-size: .6rem;
+            color: #94a3b8;
+            font-weight: 700;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            padding: .85rem .65rem .3rem;
+        }
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: .6rem;
+            padding: .52rem .75rem;
+            border-radius: 8px;
+            font-size: .855rem;
+            font-weight: 500;
+            color: #475569;
+            text-decoration: none;
+            transition: background .12s, color .12s;
+            position: relative;
+        }
+        .nav-link:hover { background: #f1f5f9; color: #1e293b; }
+        .nav-link.active { background: #eef2ff; color: #4f46e5; font-weight: 600; }
+        .nav-link.active svg { stroke: #4f46e5; }
+        .nav-link svg { flex-shrink: 0; opacity: .75; }
+        .nav-link.active svg { opacity: 1; }
+        /* Notification dot */
+        .red-dot {
+            position: absolute;
+            right: .75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #ef4444;
+            color: #fff;
+            font-size: .58rem;
+            font-weight: 800;
+            min-width: 17px;
+            height: 17px;
+            border-radius: 9999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 4px;
+        }
+        /* Sidebar footer */
+        #sidebar-signout {
+            padding: .65rem .9rem;
+            border-top: 1px solid #f1f5f9;
+            flex-shrink: 0;
+        }
+        #sidebar-signout form button {
             width: 100%;
-            border: 1px solid rgb(203 213 225);
-            border-radius: 0.375rem;
-            padding: 0.5rem 0.75rem;
-            background: white;
+            background: #fff;
+            border: 1.5px solid #e2e8f0;
+            color: #ef4444;
+            border-radius: 8px;
+            padding: .5rem;
+            font-size: .78rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            transition: background .12s, border-color .12s;
+        }
+        #sidebar-signout form button:hover { background: #fff5f5; border-color: #fca5a5; }
+        #sidebar-identity {
+            padding: .85rem 1.15rem;
+            background: #fafbff;
+            border-top: 1px solid #f1f5f9;
+            flex-shrink: 0;
+        }
+        .identity-label { font-size: .58rem; color: #94a3b8; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; margin-bottom: .3rem; }
+        .identity-user { font-size: .875rem; font-weight: 700; color: #4f46e5; word-break: break-all; }
+        .identity-role { font-size: .7rem; color: #64748b; margin-top: .1rem; }
+        #live-clock { font-size: .67rem; color: #94a3b8; margin-top: .4rem; font-variant-numeric: tabular-nums; font-weight: 500; }
+
+        /* ── MAIN ── */
+        #main-content {
+            flex: 1;
+            overflow-y: auto;
+            background: #f8fafc;
+            padding: 2rem 2.5rem;
+        }
+        #main-content::-webkit-scrollbar { width: 5px; }
+        #main-content::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 3px; }
+
+        /* ── FORMS ── */
+        input[type=text], input[type=email], input[type=password],
+        input[type=date], input[type=number], input[type=url], select, textarea {
+            width: 100%;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 8px;
+            padding: .6rem .85rem;
+            background: #ffffff;
+            color: #0f172a;
+            font-size: .875rem;
+            font-family: inherit;
+            transition: border-color .15s, box-shadow .15s;
         }
         input:focus, select:focus, textarea:focus {
-            outline: 2px solid rgb(99 102 241);
-            outline-offset: 1px;
-            border-color: rgb(99 102 241);
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99,102,241,.1);
         }
+        input::placeholder, textarea::placeholder { color: #94a3b8; }
+        label { color: #475569; font-size: .78rem; font-weight: 600; letter-spacing: .03em; }
+
+        /* ── BADGES ── */
+        .badge { padding: 2px 10px; border-radius: 9999px; font-size: .7rem; font-weight: 700; display: inline-block; }
+        .badge-pending   { background: #fffbeb; color: #92400e; border: 1px solid #fde68a; }
+        .badge-submitted { background: #eef2ff; color: #3730a3; border: 1px solid #c7d2fe; }
+        .badge-accepted  { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
+        .badge-rejected  { background: #fff1f2; color: #9f1239; border: 1px solid #fecdd3; }
+        .badge-open      { background: #fff7ed; color: #9a3412; border: 1px solid #fed7aa; }
+        .badge-resolved  { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
+
+        /* ── CARDS ── */
+        .card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        /* ── PAGE HEADER ── */
+        .page-header {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 1.4rem 1.75rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .page-header h1 { font-size: 1.3rem; font-weight: 800; color: #0f172a; margin: 0; letter-spacing: -.025em; }
+        .page-header p { font-size: .82rem; color: #64748b; margin: .2rem 0 0; }
+
+        /* ── TABLES ── */
+        .data-table { width: 100%; border-collapse: collapse; font-size: .85rem; }
+        .data-table thead th {
+            background: #f8fafc;
+            color: #475569;
+            font-size: .7rem;
+            font-weight: 700;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            padding: .7rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .data-table tbody tr { border-bottom: 1px solid #f1f5f9; }
+        .data-table tbody tr:hover { background: #fafbff; }
+        .data-table td { padding: .75rem 1rem; color: #334155; vertical-align: middle; }
+
+        /* ── ALERTS ── */
+        .alert-success { background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; border-radius: 8px; padding: .85rem 1.25rem; font-size: .875rem; }
+        .alert-error   { background: #fff1f2; border: 1px solid #fecdd3; color: #9f1239; border-radius: 8px; padding: .85rem 1.25rem; font-size: .875rem; }
+
+        /* ── BUTTONS ── */
+        .btn { font-weight: 600; padding: .55rem 1.25rem; border-radius: 8px; border: none; cursor: pointer; font-size: .875rem; font-family: inherit; transition: background .15s, box-shadow .15s, transform .1s; display: inline-block; text-decoration: none; }
+        .btn:hover { transform: translateY(-1px); }
+        .btn-primary { background: #4f46e5; color: #fff; }
+        .btn-primary:hover { background: #4338ca; box-shadow: 0 4px 12px rgba(79,70,229,.25); }
+        .btn-success { background: #059669; color: #fff; }
+        .btn-success:hover { background: #047857; box-shadow: 0 4px 12px rgba(5,150,105,.2); }
+        .btn-danger  { background: #e11d48; color: #fff; }
+        .btn-danger:hover  { background: #be123c; box-shadow: 0 4px 12px rgba(225,29,72,.2); }
+        .btn-outline { background: transparent; color: #4f46e5; border: 1.5px solid #c7d2fe; }
+        .btn-outline:hover { background: #eef2ff; border-color: #818cf8; }
+        .btn-sm { padding: .38rem .85rem; font-size: .8rem; }
+
+        /* ── STAT CARDS ── */
+        .stat-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 1.25rem 1.5rem; }
+
+        /* ── TABS ── */
+        .tab-btn {
+            padding: .48rem 1.15rem;
+            border-radius: 8px;
+            font-size: .84rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1.5px solid transparent;
+            background: transparent;
+            color: #64748b;
+            font-family: inherit;
+            transition: background .12s, color .12s, border-color .12s;
+        }
+        .tab-btn:hover { background: #f1f5f9; color: #1e293b; }
+        .tab-btn.active { background: #eef2ff; color: #4f46e5; border-color: #c7d2fe; }
+
+        /* ── SECTION TITLE ── */
+        .section-title { font-size: 1rem; font-weight: 700; color: #0f172a; margin-bottom: 1rem; display: flex; align-items: center; gap: .5rem; }
     </style>
 </head>
-<body class="min-h-screen bg-slate-50 text-slate-900">
-    <div class="flex min-h-screen">
-        <aside class="hidden w-72 border-r border-slate-200 bg-white px-6 py-7 lg:block">
-            <div class="text-2xl font-bold tracking-tight text-indigo-700">bputnotes.in</div>
-            <p class="mt-1 text-sm text-slate-500">Management Workspace</p>
-            {% if user.is_authenticated %}
-            <div class="mt-8 rounded-lg border border-slate-200 bg-slate-50 p-4">
-                <p class="text-sm font-semibold">{{ user.username }}</p>
-                <p class="mt-1 text-xs uppercase tracking-wide text-slate-500">{{ user.get_role_display }}</p>
+<body>
+<div id="app-shell">
+
+<!-- SIDEBAR -->
+<aside id="sidebar">
+    <div id="sidebar-brand">
+        <div class="brand-lockup">
+            <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="64" height="64" rx="16" fill="#2563eb"/>
+              <path d="M18 46V18h15c3.5 0 6.2.9 8 2.7 1.8 1.7 2.7 3.8 2.7 6.3 0 1.7-.5 3.2-1.5 4.4-.9 1.1-2 1.8-3.2 2.2 1.7.3 3 1.2 4 2.5 1 1.3 1.5 2.9 1.5 4.8 0 2.9-1 5.1-3 6.7-2 1.6-4.8 2.4-8.5 2.4H18zm6.2-17h8.3c1.9 0 3.3-.5 4.2-1.3.9-.8 1.4-1.9 1.4-3.2 0-1.4-.5-2.5-1.4-3.2-.9-.8-2.3-1.2-4.1-1.2h-8.4v8.9zm0 12h9.2c2 0 3.5-.5 4.5-1.5 1-.9 1.5-2.2 1.5-3.7s-.5-2.8-1.5-3.7c-1-1-2.5-1.4-4.5-1.4h-9.2v10.3z" fill="white"/>
+            </svg>
+            <div class="brand-text">
+                <div class="brand-logo">bputnotes.in</div>
+                <p class="brand-sub">Management Workspace</p>
             </div>
-            <form method="post" action="{% url 'logout' %}" class="mt-6">
-                {% csrf_token %}
-                <button class="w-full rounded-md bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-700">Sign out</button>
-            </form>
-            {% endif %}
-        </aside>
-        <main class="flex-1 px-4 py-6 sm:px-8 lg:px-10">
-            {% if messages %}
-            <div class="mb-5 space-y-2">
-                {% for message in messages %}
-                <div class="rounded-md border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800">{{ message }}</div>
-                {% endfor %}
-            </div>
-            {% endif %}
-            {% block content %}{% endblock %}
-        </main>
+        </div>
     </div>
+
+    {% if user.is_authenticated %}
+    <nav>
+        {% if user.role == "ADMIN" %}
+        <p class="nav-section">Overview</p>
+        <a href="{% url 'admin-dashboard' %}" class="nav-link {% block nav_admin_dashboard %}{% endblock %}">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+            Dashboard
+        </a>
+        <p class="nav-section">People</p>
+        <a href="{% url 'user-management' %}" class="nav-link {% block nav_user_mgmt %}{% endblock %}">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+            User Management
+            {% if unread_interns %}<span class="red-dot">{{ unread_interns }}</span>{% endif %}
+        </a>
+        <a href="{% url 'create-intern' %}" class="nav-link {% block nav_create_intern %}{% endblock %}">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+            Create Intern
+        </a>
+        <a href="{% url 'admin-attendance' %}" class="nav-link {% block nav_attendance %}{% endblock %}">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            Attendance
+        </a>
+        <p class="nav-section">Records</p>
+        <a href="{% url 'admin-archive' %}" class="nav-link {% block nav_admin_archive %}{% endblock %}">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+            Archive
+        </a>
+        <p class="nav-section">Notices</p>
+        <a href="{% url 'announcements' %}" class="nav-link {% block nav_announcements_admin %}{% endblock %}">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            Announcements
+            {% if unread_announcements %}<span class="red-dot">{{ unread_announcements }}</span>{% endif %}
+        </a>
+
+        {% elif user.role == "CONTENT_SUPERVISOR" or user.role == "TECH_SUPERVISOR" %}
+        <p class="nav-section">Overview</p>
+        <a href="{% url 'tasks' %}" class="nav-link {% block nav_sv_dashboard %}{% endblock %}">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+            Dashboard
+            {% if unread_submissions or unread_tickets %}<span class="red-dot">{{ unread_submissions|add:unread_tickets }}</span>{% endif %}
+        </a>
+        <p class="nav-section">Tasks</p>
+        <a href="{% url 'assign-task' %}" class="nav-link {% block nav_assign_task %}{% endblock %}">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Assign Task
+        </a>
+        <a href="{% url 'supervisor-archive' %}" class="nav-link {% block nav_sv_archive %}{% endblock %}">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+            Archive
+        </a>
+        <p class="nav-section">Notices</p>
+        <a href="{% url 'announcements' %}" class="nav-link {% block nav_announcements_sv %}{% endblock %}">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            Announcements
+            {% if unread_announcements %}<span class="red-dot">{{ unread_announcements }}</span>{% endif %}
+        </a>
+
+        {% else %}
+        <p class="nav-section">Overview</p>
+        <a href="{% url 'tasks' %}" class="nav-link {% block nav_intern_dashboard %}{% endblock %}">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+            Dashboard
+        </a>
+        <p class="nav-section">Work</p>
+        <a href="{% url 'tasks' %}" class="nav-link {% block nav_my_tasks %}{% endblock %}">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+            My Tasks
+            {% if unread_tasks %}<span class="red-dot">{{ unread_tasks }}</span>{% endif %}
+        </a>
+        <a href="{% url 'tickets' %}" class="nav-link {% block nav_tickets %}{% endblock %}">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"/></svg>
+            My Tickets
+        </a>
+        <p class="nav-section">Notices</p>
+        <a href="{% url 'announcements' %}" class="nav-link {% block nav_announcements_intern %}{% endblock %}">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            Announcements
+            {% if unread_announcements %}<span class="red-dot">{{ unread_announcements }}</span>{% endif %}
+        </a>
+        {% endif %}
+
+        <p class="nav-section">Account</p>
+        <a href="{% url 'profile' %}" class="nav-link {% block nav_profile %}{% endblock %}">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            Profile
+        </a>
+    </nav>
+
+    <div id="sidebar-signout">
+        <form method="post" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button type="submit">Sign Out</button>
+        </form>
+    </div>
+
+    <div id="sidebar-identity">
+        <p class="identity-label">Active Session</p>
+        <p class="identity-user">{% if user.intern_id %}{{ user.intern_id }}{% else %}{{ user.username }}{% endif %}</p>
+        <p class="identity-role">{{ user.get_role_display }}</p>
+        <p id="live-clock"></p>
+    </div>
+    {% endif %}
+</aside>
+
+<!-- MAIN -->
+<main id="main-content">
+    {% if messages %}
+    <div style="margin-bottom:1.25rem; display:flex; flex-direction:column; gap:.5rem;">
+        {% for message in messages %}
+        <div class="{% if message.tags == 'error' %}alert-error{% else %}alert-success{% endif %}">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% block content %}{% endblock %}
+</main>
+</div>
+
+<script>
+function tickClock() {
+    const el = document.getElementById('live-clock');
+    if (!el) return;
+    const now = new Date();
+    const date = now.toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric'});
+    const time = now.toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:false});
+    el.innerText = date + '  |  ' + time;
+}
+tickClock(); setInterval(tickClock, 1000);
+</script>
+{% block extra_js %}{% endblock %}
 </body>
 </html>

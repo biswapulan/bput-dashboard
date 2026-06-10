@@ -1,38 +1,119 @@
-<div class="mt-6 grid gap-6 xl:grid-cols-[420px_1fr]">
-    <section class="space-y-6">
-        <div class="rounded-lg bg-white p-6 shadow-sm ring-1 ring-slate-200">
-            <h2 class="text-xl font-bold">{{ submission_title }}</h2>
-            <form method="post" class="mt-4 space-y-4">
+<div style="display:grid; grid-template-columns:360px 1fr; gap:1.5rem; align-items:start;">
+
+    <!-- LEFT: Forms -->
+    <div style="display:flex; flex-direction:column; gap:1.25rem;">
+        <!-- Submission form -->
+        <div class="card">
+            <h2 class="section-title"> {{ submission_title }}</h2>
+            <form method="post" style="display:flex; flex-direction:column; gap:1rem;">
                 {% csrf_token %}
                 {% include "dashboard/_form.html" with form=submission_form %}
-                <button name="{{ submit_name }}" class="rounded-md bg-indigo-700 px-4 py-2 font-semibold text-white hover:bg-indigo-600">Submit</button>
+                <button name="{{ submit_name }}" class="btn-primary" style="margin-top:.35rem;">Submit for Review</button>
             </form>
         </div>
-        <div class="rounded-lg bg-white p-6 shadow-sm ring-1 ring-slate-200">
-            <h2 class="text-xl font-bold">Raise support ticket</h2>
-            <form method="post" class="mt-4 space-y-4">
+        <!-- Ticket form -->
+        <div class="card" style="border-color:#3b0a0a;">
+            <h2 class="section-title" style="color:#e11d48;"> Raise Support Ticket</h2>
+            <form method="post" style="display:flex; flex-direction:column; gap:1rem;">
                 {% csrf_token %}
                 {% include "dashboard/_form.html" with form=ticket_form %}
-                <button name="raise_ticket" class="rounded-md bg-slate-900 px-4 py-2 font-semibold text-white hover:bg-slate-700">Raise ticket</button>
+                <button name="raise_ticket" style="background:#be123c; color:#fff; font-weight:600; padding:.6rem 1.25rem; border-radius:.5rem; border:none; cursor:pointer; font-size:.875rem; margin-top:.35rem;">Raise Ticket</button>
             </form>
         </div>
-    </section>
-    <section class="rounded-lg bg-white p-6 shadow-sm ring-1 ring-slate-200">
-        <h2 class="text-xl font-bold">{{ history_title }}</h2>
-        <div class="mt-4 overflow-x-auto">
-            <table class="min-w-full text-left text-sm">
-                <thead class="bg-slate-100 text-slate-600"><tr><th class="px-3 py-2">Item</th><th class="px-3 py-2">Status</th><th class="px-3 py-2">Remark</th><th class="px-3 py-2">Date</th></tr></thead>
-                <tbody class="divide-y divide-slate-100">
-                    {% for item in submissions %}
-                    <tr>
-                        <td class="px-3 py-3"><a href="{{ item.submission_link }}" target="_blank" rel="noopener" class="font-medium text-indigo-700 hover:underline">{{ item.subject_code_or_task_title }}</a></td>
-                        <td class="px-3 py-3"><span class="rounded-full bg-slate-100 px-2 py-1 text-xs font-bold">{{ item.get_status_display }}</span></td>
-                        <td class="px-3 py-3 text-slate-600">{{ item.supervisor_remark|default:"Awaiting review" }}</td>
-                        <td class="px-3 py-3 text-slate-500">{{ item.created_at|date:"M d, Y" }}</td>
-                    </tr>
-                    {% empty %}<tr><td class="px-3 py-3 text-slate-500" colspan="4">No submissions yet.</td></tr>{% endfor %}
-                </tbody>
-            </table>
+    </div>
+
+    <!-- RIGHT: History panels -->
+    <div class="card" style="min-width:0;">
+        <!-- Tab buttons -->
+        <div style="display:flex; gap:.6rem; margin-bottom:1.5rem; border:1px solid #e2e8f0; padding-bottom:1rem;">
+            <button class="tab-btn active" data-tab-btn="tasks"> Task Submissions</button>
+            <button class="tab-btn" data-tab-btn="tickets"> Help Desk</button>
         </div>
-    </section>
+
+        <!-- Task history -->
+        <div id="intern-tab-tasks">
+            <div style="overflow-x:auto;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Token ID</th>
+                            <th>Task / Subject</th>
+                            <th>Type</th>
+                            <th>Status</th>
+                            <th>Remark</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in submissions %}
+                        <tr>
+                            <td style="font-family:monospace; color:#059669; font-weight:700; font-size:.78rem; white-space:nowrap;">{{ item.token_id }}</td>
+                            <td>
+                                <a href="{{ item.submission_link }}" target="_blank" rel="noopener" style="color:#334155; font-weight:500; font-size:.85rem; text-decoration:none; hover:color:#059669;">
+                                    {{ item.subject_code_or_task_title }}
+                                </a>
+                                {% if item.description %}<br><span style="font-size:.72rem; color:#475569;">{{ item.description|truncatechars:60 }}</span>{% endif %}
+                            </td>
+                            <td style="font-size:.78rem; color:#64748b;">{{ item.get_material_type_display }}</td>
+                            <td>
+                                {% if item.status == "ACCEPTED" %}<span class="badge-accepted">{{ item.get_status_display }}</span>
+                                {% elif item.status == "REJECTED" %}<span class="badge-rejected">{{ item.get_status_display }}</span>
+                                {% else %}<span class="badge-pending">{{ item.get_status_display }}</span>{% endif %}
+                            </td>
+                            <td style="font-size:.78rem; color:#64748b;">{{ item.supervisor_remark|default:"Awaiting review" }}</td>
+                            <td style="font-size:.75rem; color:#475569; white-space:nowrap;">{{ item.created_at|date:"M d, Y" }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="6" style="color:#334155; font-style:italic; text-align:center; padding:2rem;">No submissions yet. Submit your first task above.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Ticket history -->
+        <div id="intern-tab-tickets" style="display:none;">
+            <div style="overflow-x:auto;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Token ID</th>
+                            <th>Subject</th>
+                            <th>Description</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ticket in tickets %}
+                        <tr>
+                            <td style="font-family:monospace; color:#e11d48; font-weight:700; font-size:.78rem; white-space:nowrap;">{{ ticket.token_id }}</td>
+                            <td style="color:#334155; font-weight:500; font-size:.85rem;">{{ ticket.subject }}</td>
+                            <td style="font-size:.78rem; color:#64748b;">{{ ticket.description|truncatechars:60 }}</td>
+                            <td>
+                                {% if ticket.status == "RESOLVED" %}<span class="badge-resolved">{{ ticket.get_status_display }}</span>
+                                {% else %}<span class="badge-open">{{ ticket.get_status_display }}</span>{% endif %}
+                            </td>
+                            <td style="font-size:.75rem; color:#475569; white-space:nowrap;">{{ ticket.created_at|date:"M d, Y" }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="5" style="color:#334155; font-style:italic; text-align:center; padding:2rem;">No support tickets raised yet.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
+
+<script>
+    document.querySelectorAll('[data-tab-btn]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('[data-tab-btn]').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const target = btn.getAttribute('data-tab-btn');
+            document.getElementById('intern-tab-tasks').style.display = target === 'tasks' ? '' : 'none';
+            document.getElementById('intern-tab-tickets').style.display = target === 'tickets' ? '' : 'none';
+        });
+    });
+</script>

@@ -1,46 +1,150 @@
-<div class="mt-6 grid gap-6 xl:grid-cols-[1fr_420px]">
-    <section class="rounded-lg bg-white p-6 shadow-sm ring-1 ring-slate-200">
-        <h2 class="text-xl font-bold">Pending submissions</h2>
-        <div class="mt-4 space-y-4">
-            {% for item in submissions %}
-            <article class="rounded-lg border border-slate-200 p-4">
-                <div class="flex flex-wrap items-start justify-between gap-3">
-                    <div>
-                        <p class="font-bold">{{ item.subject_code_or_task_title }}</p>
-                        <p class="text-sm text-slate-500">{{ item.intern.username }} · {{ item.get_material_type_display }} · {{ item.created_at|date:"M d, Y" }}</p>
-                    </div>
-                    <a class="rounded-md border border-indigo-200 px-3 py-2 text-sm font-semibold text-indigo-700 hover:bg-indigo-50" href="{{ item.submission_link }}" target="_blank" rel="noopener">{{ link_label }}</a>
-                </div>
-                <div class="mt-4 grid gap-3 md:grid-cols-2">
-                    <form method="post" action="{% url 'review-submission' item.id 'approve' %}">
-                        {% csrf_token %}
-                        <textarea name="remark" rows="3" class="w-full rounded-md border border-slate-300 px-3 py-2" placeholder="{{ remark_placeholder }}"></textarea>
-                        <button class="mt-2 rounded-md bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-500">Approve</button>
-                    </form>
-                    <form method="post" action="{% url 'review-submission' item.id 'reject' %}">
-                        {% csrf_token %}
-                        <textarea name="remark" rows="3" class="w-full rounded-md border border-slate-300 px-3 py-2" placeholder="{{ remark_placeholder }}"></textarea>
-                        <button class="mt-2 rounded-md bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-500">Reject</button>
-                    </form>
-                </div>
-            </article>
-            {% empty %}<p class="rounded-md bg-slate-50 p-4 text-sm text-slate-500">No pending submissions.</p>{% endfor %}
-        </div>
-    </section>
-    <section class="rounded-lg bg-white p-6 shadow-sm ring-1 ring-slate-200">
-        <h2 class="text-xl font-bold">Open help desk tickets</h2>
-        <div class="mt-4 space-y-3">
-            {% for ticket in tickets %}
-            <article class="rounded-lg border border-slate-200 p-4">
-                <p class="font-semibold">{{ ticket.subject }}</p>
-                <p class="mt-1 text-sm text-slate-600">{{ ticket.description }}</p>
-                <p class="mt-2 text-xs text-slate-500">Raised by {{ ticket.raised_by.username }}</p>
-                <form method="post" action="{% url 'resolve-ticket' ticket.id %}" class="mt-3">
-                    {% csrf_token %}
-                    <button class="rounded-md bg-slate-900 px-3 py-2 text-sm font-semibold text-white hover:bg-slate-700">Resolve</button>
-                </form>
-            </article>
-            {% empty %}<p class="rounded-md bg-slate-50 p-4 text-sm text-slate-500">No open tickets.</p>{% endfor %}
-        </div>
-    </section>
+<!-- Tab bar -->
+<div style="display:flex; gap:.6rem; margin-bottom:1.75rem; flex-wrap:wrap; border:1px solid #e2e8f0; padding-bottom:1rem;">
+    <button class="tab-btn active" data-tab="pending">⏳ Pending Queue</button>
+    <button class="tab-btn" data-tab="tickets"> Open Tickets</button>
+    <button class="tab-btn" data-tab="archive"> Archive</button>
 </div>
+
+<!--  PENDING SUBMISSIONS  -->
+<div id="sv-tab-pending">
+    {% if submissions %}
+    <div style="display:flex; flex-direction:column; gap:1.25rem;">
+        {% for item in submissions %}
+        <div class="card" style="border-left:3px solid #fbbf24;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:1rem;">
+                <div>
+                    <div style="display:flex; align-items:center; gap:.75rem; flex-wrap:wrap;">
+                        <span style="font-family:monospace; font-size:.82rem; font-weight:700; color:#d97706;">{{ item.token_id }}</span>
+                        <span style="font-size:.75rem; background:#f1f5f9; color:#94a3b8; padding:.2rem .6rem; border-radius:.3rem;">{{ item.get_material_type_display }}</span>
+                    </div>
+                    <p style="font-size:1rem; font-weight:700; color:#0f172a; margin-top:.4rem;">{{ item.subject_code_or_task_title }}</p>
+                    {% if item.description %}
+                    <p style="font-size:.82rem; color:#64748b; margin-top:.3rem;">{{ item.description }}</p>
+                    {% endif %}
+                    <div style="display:flex; gap:1.5rem; margin-top:.5rem; font-size:.78rem; color:#475569; flex-wrap:wrap;">
+                        <span> {{ item.intern.get_full_name|default:item.intern.username }}</span>
+                        <span style="color:#059669; font-family:monospace;">{{ item.intern.intern_id|default:"No ID" }}</span>
+                        <span> {{ item.created_at|date:"M d, Y" }}</span>
+                    </div>
+                </div>
+                <a href="{{ item.submission_link }}" target="_blank" rel="noopener" class="btn-outline" style="white-space:nowrap;">{{ link_label }} ↗</a>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-top:1.25rem; border:1px solid #e2e8f0; padding-top:1.25rem;">
+                <form method="post" action="{% url 'review-submission' item.token_id 'approve' %}">
+                    {% csrf_token %}
+                    <textarea name="remark" rows="2" placeholder="{{ remark_placeholder }}" style="font-size:.82rem; margin-bottom:.6rem;"></textarea>
+                    <button type="submit" class="btn-primary" style="width:100%;"> Approve</button>
+                </form>
+                <form method="post" action="{% url 'review-submission' item.token_id 'reject' %}">
+                    {% csrf_token %}
+                    <textarea name="remark" rows="2" placeholder="{{ remark_placeholder }}" style="font-size:.82rem; margin-bottom:.6rem;"></textarea>
+                    <button type="submit" class="btn-danger" style="width:100%; padding:.6rem;"> Reject</button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div style="text-align:center; padding:4rem 2rem; color:#334155;">
+        <p style="font-size:2.5rem;"></p>
+        <p style="font-size:1rem; margin-top:.5rem; font-weight:600; color:#475569;">Queue is clear</p>
+        <p style="font-size:.82rem; margin-top:.25rem;">No pending submissions.</p>
+    </div>
+    {% endif %}
+</div>
+
+<!--  OPEN TICKETS  -->
+<div id="sv-tab-tickets" style="display:none;">
+    {% if tickets %}
+    <div style="display:flex; flex-direction:column; gap:1.25rem;">
+        {% for ticket in tickets %}
+        <div class="card" style="border-left:3px solid #f87171;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:.75rem;">
+                <div>
+                    <span style="font-family:monospace; font-size:.82rem; font-weight:700; color:#e11d48;">{{ ticket.token_id }}</span>
+                    <p style="font-size:1rem; font-weight:700; color:#0f172a; margin-top:.3rem;">{{ ticket.subject }}</p>
+                    <p style="font-size:.85rem; color:#64748b; margin-top:.3rem;">{{ ticket.description }}</p>
+                    <div style="display:flex; gap:1.5rem; margin-top:.5rem; font-size:.78rem; color:#475569;">
+                        <span> {{ ticket.raised_by.get_full_name|default:ticket.raised_by.username }}</span>
+                        <span style="color:#059669; font-family:monospace;">{{ ticket.raised_by.intern_id|default:"No ID" }}</span>
+                        <span> {{ ticket.created_at|date:"M d, Y" }}</span>
+                    </div>
+                </div>
+                <form method="post" action="{% url 'resolve-ticket' ticket.token_id %}">
+                    {% csrf_token %}
+                    <button type="submit" style="background:#14532d; border:1px solid #166534; color:#166534; padding:.5rem 1.1rem; border-radius:.5rem; font-weight:600; font-size:.82rem; cursor:pointer;">Mark Resolved</button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div style="text-align:center; padding:4rem 2rem; color:#334155;">
+        <p style="font-size:2.5rem;"></p>
+        <p style="font-size:1rem; margin-top:.5rem; font-weight:600; color:#475569;">No open tickets</p>
+    </div>
+    {% endif %}
+</div>
+
+<!--  ARCHIVE  -->
+<div id="sv-tab-archive" style="display:none;">
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(400px, 1fr)); gap:1.5rem;">
+        <div class="card">
+            <h3 class="section-title"> Processed Submissions</h3>
+            <div style="overflow-x:auto;">
+                <table class="data-table">
+                    <thead><tr><th>Token</th><th>Intern</th><th>Status</th><th>Remark</th></tr></thead>
+                    <tbody>
+                        {% for item in archive_submissions %}
+                        <tr>
+                            <td style="font-family:monospace; color:#059669; font-size:.78rem; white-space:nowrap;">{{ item.token_id }}</td>
+                            <td>
+                                <span style="font-size:.82rem; font-weight:500; color:#334155;">{{ item.intern.get_full_name|default:item.intern.username }}</span>
+                                <br><span style="font-size:.7rem; color:#059669; font-family:monospace;">{{ item.intern.intern_id|default:"—" }}</span>
+                            </td>
+                            <td>
+                                {% if item.status == "ACCEPTED" %}<span class="badge-accepted">{{ item.get_status_display }}</span>
+                                {% else %}<span class="badge-rejected">{{ item.get_status_display }}</span>{% endif %}
+                            </td>
+                            <td style="font-size:.78rem; color:#64748b;">{{ item.supervisor_remark|default:"—" }}</td>
+                        </tr>
+                        {% empty %}<tr><td colspan="4" style="color:#334155; font-style:italic;">No processed submissions yet.</td></tr>{% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card">
+            <h3 class="section-title"> Resolved Tickets</h3>
+            <div style="overflow-x:auto;">
+                <table class="data-table">
+                    <thead><tr><th>Token</th><th>Raised By</th><th>Subject</th></tr></thead>
+                    <tbody>
+                        {% for ticket in archive_tickets %}
+                        <tr>
+                            <td style="font-family:monospace; color:#e11d48; font-size:.78rem; white-space:nowrap;">{{ ticket.token_id }}</td>
+                            <td>
+                                <span style="font-size:.82rem; font-weight:500; color:#334155;">{{ ticket.raised_by.get_full_name|default:ticket.raised_by.username }}</span>
+                                <br><span style="font-size:.7rem; color:#059669; font-family:monospace;">{{ ticket.raised_by.intern_id|default:"—" }}</span>
+                            </td>
+                            <td style="font-size:.82rem; color:#334155;">{{ ticket.subject }}</td>
+                        </tr>
+                        {% empty %}<tr><td colspan="3" style="color:#334155; font-style:italic;">No resolved tickets yet.</td></tr>{% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.querySelectorAll('.tab-btn[data-tab]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.tab-btn[data-tab]').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const t = btn.getAttribute('data-tab');
+            ['pending','tickets','archive'].forEach(name => {
+                document.getElementById('sv-tab-' + name).style.display = name === t ? '' : 'none';
+            });
+        });
+    });
+</script>

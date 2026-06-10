@@ -1,42 +1,48 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-
-from .models import AttendanceLog, CustomUser, Submission, Ticket
-
-
-def superuser_only_has_permission(request):
-    return request.user.is_active and request.user.is_superuser
-
-
-admin.site.has_permission = superuser_only_has_permission
+from .models import Announcement, AnnouncementRead, AssignedTask, AttendanceLog, CustomUser, InternAccountRead, Submission, SubmissionRead, TaskRead, Ticket, TicketRead
 
 
 @admin.register(CustomUser)
 class CustomUserAdmin(UserAdmin):
-    fieldsets = UserAdmin.fieldsets + (("Dashboard Role", {"fields": ("role",)}),)
-    add_fieldsets = UserAdmin.add_fieldsets + (("Dashboard Role", {"fields": ("role",)}),)
-    list_display = ("username", "email", "role", "is_staff", "is_superuser")
-    list_filter = ("role", "is_staff", "is_superuser")
+    list_display = ("username", "intern_id", "role", "department", "college_name")
+    list_filter = ("role", "department")
+    fieldsets = UserAdmin.fieldsets + (
+        ("BPUT Info", {"fields": ("role", "department", "year", "college_name", "intern_id", "date_of_joining")}),
+    )
+
+
+@admin.register(AssignedTask)
+class AssignedTaskAdmin(admin.ModelAdmin):
+    list_display = ("task_id", "title", "assigned_to", "assigned_by", "status", "created_at")
+    list_filter = ("status",)
 
 
 @admin.register(Submission)
 class SubmissionAdmin(admin.ModelAdmin):
-    list_display = ("subject_code_or_task_title", "intern", "task_type", "status", "created_at")
-    list_filter = ("task_type", "material_type", "status", "semester")
-    search_fields = ("subject_code_or_task_title", "intern__username", "submission_link")
+    list_display = ("token_id", "intern", "task", "status", "created_at")
+    list_filter = ("status",)
+
+
+@admin.register(Ticket)
+class TicketAdmin(admin.ModelAdmin):
+    list_display = ("token_id", "raised_by", "department", "subject", "status", "created_at")
+    list_filter = ("department", "status")
 
 
 @admin.register(AttendanceLog)
 class AttendanceLogAdmin(admin.ModelAdmin):
     list_display = ("user", "login_date", "first_login_time")
     list_filter = ("login_date",)
-    search_fields = ("user__username",)
 
 
-@admin.register(Ticket)
-class TicketAdmin(admin.ModelAdmin):
-    list_display = ("subject", "raised_by", "department", "status", "created_at")
-    list_filter = ("department", "status")
-    search_fields = ("subject", "description", "raised_by__username")
+@admin.register(Announcement)
+class AnnouncementAdmin(admin.ModelAdmin):
+    list_display = ("ann_id", "title", "created_by", "created_at")
 
-# Register your models here.
+
+admin.site.register(AnnouncementRead)
+admin.site.register(TaskRead)
+admin.site.register(SubmissionRead)
+admin.site.register(TicketRead)
+admin.site.register(InternAccountRead)
