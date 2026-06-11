@@ -9,6 +9,8 @@ def delete_orphan_submissions(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
+    atomic = False  # ← this is the fix
+
     dependencies = [
         ("dashboard", "0004_announcement_announcementread_assignedtask_and_more"),
     ]
