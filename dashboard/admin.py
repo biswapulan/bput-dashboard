@@ -8,7 +8,7 @@ class CustomUserAdmin(UserAdmin):
     list_display = ("username", "intern_id", "role", "department", "college_name")
     list_filter = ("role", "department")
     fieldsets = UserAdmin.fieldsets + (
-        ("BPUT Info", {"fields": ("role", "department", "year", "college_name", "intern_id", "date_of_joining")}),
+        ("BPUT Info", {"fields": ("role", "department", "year", "college_name", "intern_id")}),
     )
 
 
