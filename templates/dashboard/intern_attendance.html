@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}My Attendance{% endblock %}
+{% block nav_intern_attendance %}active{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>My Attendance</h1>
+        <p>Your login and logout history</p>
+    </div>
+</div>
+
+<div class="card">
+    <div style="overflow-x:auto;">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Login Time</th>
+                    <th>Logout Time</th>
+                    <th>Duration</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in logs %}
+                <tr>
+                    <td style="color:#4f46e5; font-weight:600; font-size:.82rem; white-space:nowrap;">{{ log.login_date|date:"M d, Y" }}</td>
+                    <td style="font-size:.8rem; color:#64748b; white-space:nowrap; font-family:monospace;">{{ log.first_login_time|date:"H:i:s" }}</td>
+                    <td style="font-size:.8rem; color:#64748b; white-space:nowrap; font-family:monospace;">
+                        {% if log.logout_time %}{{ log.logout_time|date:"H:i:s" }}{% else %}—{% endif %}
+                    </td>
+                    <td style="font-size:.8rem; color:#64748b; white-space:nowrap; font-family:monospace;">
+                        {% if log.duration %}{{ log.duration }}{% else %}—{% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" style="text-align:center; color:#334155; font-style:italic; padding:3rem;">
+                        No attendance records yet.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

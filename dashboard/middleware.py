@@ -1,6 +1,8 @@
 from django.utils import timezone
 
-from .models import AttendanceLog
+from .models import AttendanceLog, CustomUser
+
+INTERN_ROLES = {CustomUser.Role.CONTENT_INTERN, CustomUser.Role.TECH_INTERN}
 
 
 class AttendanceLogMiddleware:
@@ -20,5 +22,7 @@ class AttendanceLogMiddleware:
     def _should_log_attendance(self, request):
         user = getattr(request, "user", None)
         if not user or not user.is_authenticated:
+            return False
+        if user.role not in INTERN_ROLES:
             return False
         return request.path.startswith("/dashboard") or request.path == "/"

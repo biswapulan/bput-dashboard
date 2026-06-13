@@ -25,11 +25,6 @@
         <p style="font-size:2rem; font-weight:800; color:#d97706; margin-top:.25rem;">{{ present_this_month }}</p>
         <p style="font-size:.7rem; color:#334155; margin-top:.1rem;">{{ today|date:"F Y" }}</p>
     </div>
-    <div class="stat-card">
-        <p style="font-size:.72rem; color:#64748b; font-weight:700; text-transform:uppercase; letter-spacing:.07em;">Absent Today</p>
-        <p style="font-size:2rem; font-weight:800; color:#e11d48; margin-top:.25rem;">{{ total_interns|add:"-"|add:present_today }}</p>
-        {% with absent=total_interns|add:"-1" %}{% endwith %}
-    </div>
 </div>
 
 <!-- Filters -->
@@ -78,6 +73,7 @@
                     <th>Department</th>
                     <th>College</th>
                     <th>First Login</th>
+                    <th>Logout</th>
                 </tr>
             </thead>
             <tbody>
@@ -100,10 +96,11 @@
                     </td>
                     <td style="font-size:.8rem; color:#64748b;">{{ log.user.college_name|default:"—"|truncatechars:30 }}</td>
                     <td style="font-size:.8rem; color:#64748b; white-space:nowrap; font-family:monospace;">{{ log.first_login_time|date:"H:i:s" }}</td>
+                    <td style="font-size:.8rem; color:#64748b; white-space:nowrap; font-family:monospace;">{% if log.logout_time %}{{ log.logout_time|date:"H:i:s" }}{% else %}—{% endif %}</td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="6" style="text-align:center; color:#334155; font-style:italic; padding:3rem;">
+                    <td colspan="7" style="text-align:center; color:#334155; font-style:italic; padding:3rem;">
                         {% if filter_date or filter_dept or filter_intern %}
                         No records match your filters.
                         {% else %}

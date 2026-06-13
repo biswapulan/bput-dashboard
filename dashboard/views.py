@@ -518,6 +518,16 @@ def intern_dashboard(request):
 
 
 @role_required(CustomUser.Role.CONTENT_INTERN, CustomUser.Role.TECH_INTERN)
+def intern_attendance(request):
+    logs = AttendanceLog.objects.filter(user=request.user).order_by("-login_date")
+    counts = get_unread_counts(request.user)
+    return render(request, "dashboard/intern_attendance.html", {
+        "logs": logs,
+        **counts,
+    })
+
+
+@role_required(CustomUser.Role.CONTENT_INTERN, CustomUser.Role.TECH_INTERN)
 def submit_task(request, task_id):
     task = get_object_or_404(AssignedTask, task_id=task_id, assigned_to=request.user)
 

@@ -151,6 +151,7 @@ class AttendanceLog(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="attendance_logs")
     login_date = models.DateField(db_index=True)
     first_login_time = models.DateTimeField()
+    logout_time = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         constraints = [
@@ -160,6 +161,12 @@ class AttendanceLog(models.Model):
 
     def __str__(self):
         return f"{self.user.username} present on {self.login_date}"
+
+    @property
+    def duration(self):
+        if self.logout_time and self.first_login_time:
+            return self.logout_time - self.first_login_time
+        return None
 
 
 class Ticket(models.Model):
