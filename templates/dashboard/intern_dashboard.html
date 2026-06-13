@@ -20,50 +20,86 @@
 <!-- My Tasks -->
 <div id="intern-tab-tasks">
     {% if tasks %}
-    <div style="display:flex; flex-direction:column; gap:1.25rem;">
+    <div style="border:1px solid #e2e8f0; border-radius:10px; overflow:hidden; background:#fff;">
+        <!-- Table Header -->
+        <div style="display:grid; grid-template-columns:1fr auto auto; gap:1rem; padding:.6rem 1.25rem; background:#f8fafc; border-bottom:1px solid #e2e8f0;">
+            <span style="font-size:.7rem; font-weight:600; color:#94a3b8; text-transform:uppercase; letter-spacing:.06em;">Task</span>
+            <span style="font-size:.7rem; font-weight:600; color:#94a3b8; text-transform:uppercase; letter-spacing:.06em;">Status</span>
+            <span style="font-size:.7rem; font-weight:600; color:#94a3b8; text-transform:uppercase; letter-spacing:.06em;">Date</span>
+        </div>
         {% for task in tasks %}
-        <div class="card" style="border-left:3px solid {% if task.status == 'ACCEPTED' %}#34d399{% elif task.status == 'SUBMITTED' %}#6366f1{% elif task.status == 'REJECTED' %}#f87171{% else %}#fbbf24{% endif %};">
-            <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:.75rem;">
-                <div style="flex:1; min-width:0;">
-                    <div style="display:flex; align-items:center; gap:.75rem; flex-wrap:wrap; margin-bottom:.4rem;">
-                        <span style="font-family:monospace; font-size:.82rem; font-weight:700; color:#4f46e5;">{{ task.task_id }}</span>
-                        {% if task.status == "PENDING" %}<span class="badge badge-pending">Pending</span>
-                        {% elif task.status == "SUBMITTED" %}<span class="badge badge-submitted">Submitted</span>
-                        {% elif task.status == "ACCEPTED" %}<span class="badge badge-accepted">Accepted </span>
-                        {% elif task.status == "REJECTED" %}<span class="badge badge-rejected">Rejected</span>
-                        {% endif %}
+        <!-- Row -->
+        <div class="task-accordion-row" data-index="{{ forloop.counter }}" style="border-bottom:{% if not forloop.last %}1px solid #f1f5f9{% else %}none{% endif %};">
+            <!-- Clickable summary row -->
+            <div class="task-row-header" onclick="toggleTask({{ forloop.counter }})" style="display:grid; grid-template-columns:1fr auto auto; gap:1rem; align-items:center; padding:.85rem 1.25rem; cursor:pointer; transition:background .15s;">
+                <div style="min-width:0;">
+                    <div style="display:flex; align-items:center; gap:.6rem; flex-wrap:wrap;">
+                        <span style="font-family:monospace; font-size:.72rem; font-weight:600; color:#94a3b8;">{{ task.task_id }}</span>
+                        <span style="font-size:.9rem; font-weight:600; color:#0f172a; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ task.title }}</span>
                     </div>
-                    <p style="font-size:1rem; font-weight:700; color:#0f172a; margin-bottom:.3rem;">{{ task.title }}</p>
-                    {% if task.description %}<p style="font-size:.85rem; color:#64748b; margin-bottom:.4rem;">{{ task.description }}</p>{% endif %}
-                    {% if task.task_link %}
-                    <a href="{{ task.task_link }}" target="_blank" rel="noopener" style="font-size:.8rem; color:#4f46e5;">View task details ↗</a>
+                </div>
+                <div>
+                    {% if task.status == "PENDING" %}<span class="badge badge-pending">Pending</span>
+                    {% elif task.status == "SUBMITTED" %}<span class="badge badge-submitted">Submitted</span>
+                    {% elif task.status == "ACCEPTED" %}<span class="badge badge-accepted">Accepted</span>
+                    {% elif task.status == "REJECTED" %}<span class="badge badge-rejected">Rejected</span>
                     {% endif %}
-                    <div style="display:flex; gap:1.5rem; margin-top:.5rem; font-size:.76rem; color:#475569; flex-wrap:wrap;">
-                        <span>Assigned by: {{ task.assigned_by.get_full_name|default:task.assigned_by.username }}</span>
-                        <span> {{ task.created_at|date:"M d, Y" }}</span>
+                </div>
+                <div style="display:flex; align-items:center; gap:.75rem;">
+                    <span style="font-size:.75rem; color:#94a3b8; white-space:nowrap;">{{ task.created_at|date:"M d, Y" }}</span>
+                    <svg class="chevron-icon" id="chevron-{{ forloop.counter }}" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transition:transform .2s; flex-shrink:0;"><polyline points="6 9 12 15 18 9"/></svg>
+                </div>
+            </div>
+            <!-- Expandable details -->
+            <div id="task-detail-{{ forloop.counter }}" style="display:none; padding:0 1.25rem 1.25rem 1.25rem; border-top:1px solid #f1f5f9;">
+                <div style="padding-top:1rem; display:flex; flex-direction:column; gap:.85rem;">
+                    {% if task.description %}
+                    <div>
+                        <p style="font-size:.7rem; font-weight:600; color:#94a3b8; text-transform:uppercase; letter-spacing:.06em; margin-bottom:.3rem;">Description</p>
+                        <p style="font-size:.875rem; color:#334155; line-height:1.6;">{{ task.description }}</p>
                     </div>
+                    {% endif %}
+                    <div style="display:flex; gap:2rem; flex-wrap:wrap;">
+                        <div>
+                            <p style="font-size:.7rem; font-weight:600; color:#94a3b8; text-transform:uppercase; letter-spacing:.06em; margin-bottom:.2rem;">Assigned By</p>
+                            <p style="font-size:.875rem; color:#334155;">{{ task.assigned_by.get_full_name|default:task.assigned_by.username }}</p>
+                        </div>
+                        <div>
+                            <p style="font-size:.7rem; font-weight:600; color:#94a3b8; text-transform:uppercase; letter-spacing:.06em; margin-bottom:.2rem;">Assigned On</p>
+                            <p style="font-size:.875rem; color:#334155;">{{ task.created_at|date:"M d, Y" }}</p>
+                        </div>
+                    </div>
+                    {% if task.task_link %}
+                    <div>
+                        <a href="{{ task.task_link }}" target="_blank" rel="noopener" style="font-size:.82rem; color:#4f46e5; text-decoration:none; font-weight:500;">View task details ↗</a>
+                    </div>
+                    {% endif %}
                     {% if task.rejection_remark %}
-                    <div style="background:#fff5f5; border:1px solid #7f1d1d; border-radius:.4rem; padding:.6rem .85rem; margin-top:.75rem;">
-                        <p style="font-size:.72rem; color:#e11d48; font-weight:700; text-transform:uppercase; letter-spacing:.06em; margin-bottom:.2rem;">Rejection Remark</p>
-                        <p style="font-size:.85rem; color:#9f1239;">{{ task.rejection_remark }}</p>
+                    <div style="background:#fafafa; border:1px solid #fecdd3; border-radius:.5rem; padding:.65rem .9rem;">
+                        <p style="font-size:.7rem; color:#94a3b8; font-weight:600; text-transform:uppercase; letter-spacing:.07em; margin-bottom:.25rem;">Rejection Remark</p>
+                        <p style="font-size:.84rem; color:#be123c;">{{ task.rejection_remark }}</p>
                     </div>
                     {% endif %}
                     {% if task.status == "ACCEPTED" %}
                     {% with task.submission as sub %}
                     {% if sub %}
-                    <div style="background:#f0fdf4; border:1px solid #065f46; border-radius:.4rem; padding:.6rem .85rem; margin-top:.75rem;">
-                        <p style="font-size:.72rem; color:#059669; font-weight:700; text-transform:uppercase; letter-spacing:.06em; margin-bottom:.2rem;">Supervisor Remark</p>
-                        <p style="font-size:.85rem; color:#166534;">{{ sub.supervisor_remark|default:"Accepted — no additional remarks." }}</p>
+                    <div style="background:#fafafa; border:1px solid #e2e8f0; border-radius:.5rem; padding:.65rem .9rem;">
+                        <p style="font-size:.7rem; color:#94a3b8; font-weight:600; text-transform:uppercase; letter-spacing:.07em; margin-bottom:.25rem;">Supervisor Remark</p>
+                        <p style="font-size:.84rem; color:#334155;">{{ sub.supervisor_remark|default:"Accepted — no additional remarks." }}</p>
                     </div>
                     {% endif %}
                     {% endwith %}
                     {% endif %}
+                    {% if task.status == "PENDING" %}
+                    <div>
+                        <a href="{% url 'submit-task' task.task_id %}" class="btn btn-primary btn-sm" style="text-decoration:none;">{% if task.rejection_remark %}Resubmit{% else %}Submit Work{% endif %}</a>
+                    </div>
+                    {% elif task.status == "REJECTED" %}
+                    <div>
+                        <a href="{% url 'submit-task' task.task_id %}" class="btn btn-outline btn-sm" style="text-decoration:none;">Resubmit</a>
+                    </div>
+                    {% endif %}
                 </div>
-                {% if task.status == "PENDING" %}
-                <a href="{% url 'submit-task' task.task_id %}" class="btn btn-primary btn-sm" style="white-space:nowrap; text-decoration:none;">{% if task.rejection_remark %}Resubmit{% else %}Submit Work{% endif %}</a>
-                {% elif task.status == "REJECTED" %}
-                <a href="{% url 'submit-task' task.task_id %}" class="btn btn-outline btn-sm" style="white-space:nowrap; text-decoration:none;">Resubmit</a>
-                {% endif %}
             </div>
         </div>
         {% endfor %}
@@ -83,24 +119,55 @@
         <a href="{% url 'raise-ticket' %}" class="btn btn-outline btn-sm" style="text-decoration:none;">+ Raise New Ticket</a>
     </div>
     {% if tickets %}
-    <div style="overflow-x:auto;">
-        <table class="data-table">
-            <thead><tr><th>Token ID</th><th>Subject</th><th>Description</th><th>Status</th><th>Date</th></tr></thead>
-            <tbody>
-                {% for ticket in tickets %}
-                <tr>
-                    <td style="font-family:monospace; color:#e11d48; font-weight:700; font-size:.78rem; white-space:nowrap;">{{ ticket.token_id }}</td>
-                    <td style="color:#334155; font-weight:500;">{{ ticket.subject }}</td>
-                    <td style="font-size:.78rem; color:#64748b;">{{ ticket.description|truncatechars:60 }}</td>
-                    <td>
-                        {% if ticket.status == "RESOLVED" %}<span class="badge badge-resolved">Resolved</span>
-                        {% else %}<span class="badge badge-open">Open</span>{% endif %}
-                    </td>
-                    <td style="font-size:.75rem; color:#475569; white-space:nowrap;">{{ ticket.created_at|date:"M d, Y" }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <div style="border:1px solid #e2e8f0; border-radius:10px; overflow:hidden; background:#fff;">
+        <!-- Header -->
+        <div style="display:grid; grid-template-columns:1fr auto auto; gap:1rem; padding:.6rem 1.25rem; background:#f8fafc; border-bottom:1px solid #e2e8f0;">
+            <span style="font-size:.7rem; font-weight:600; color:#94a3b8; text-transform:uppercase; letter-spacing:.06em;">Ticket</span>
+            <span style="font-size:.7rem; font-weight:600; color:#94a3b8; text-transform:uppercase; letter-spacing:.06em;">Status</span>
+            <span style="font-size:.7rem; font-weight:600; color:#94a3b8; text-transform:uppercase; letter-spacing:.06em;">Date</span>
+        </div>
+        {% for ticket in tickets %}
+        <div style="border-bottom:{% if not forloop.last %}1px solid #f1f5f9{% else %}none{% endif %};">
+            <!-- Clickable row -->
+            <div class="task-row-header" onclick="toggleTicket({{ forloop.counter }})" style="display:grid; grid-template-columns:1fr auto auto; gap:1rem; align-items:center; padding:.85rem 1.25rem; cursor:pointer; transition:background .15s;">
+                <div style="min-width:0;">
+                    <div style="display:flex; align-items:center; gap:.6rem; flex-wrap:wrap;">
+                        <span style="font-family:monospace; font-size:.72rem; font-weight:600; color:#94a3b8;">{{ ticket.token_id }}</span>
+                        <span style="font-size:.9rem; font-weight:600; color:#0f172a;">{{ ticket.subject }}</span>
+                        {% if ticket.supervisor_reply %}<span style="font-size:.68rem; background:#eff6ff; color:#3b82f6; border:1px solid #bfdbfe; border-radius:.3rem; padding:.1rem .4rem; font-weight:600;">Reply</span>{% endif %}
+                    </div>
+                </div>
+                <div>
+                    {% if ticket.status == "RESOLVED" %}<span class="badge badge-resolved">Resolved</span>
+                    {% else %}<span class="badge badge-open">Open</span>{% endif %}
+                </div>
+                <div style="display:flex; align-items:center; gap:.75rem;">
+                    <span style="font-size:.75rem; color:#94a3b8; white-space:nowrap;">{{ ticket.created_at|date:"M d, Y" }}</span>
+                    <svg class="chevron-icon" id="tchevron-{{ forloop.counter }}" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transition:transform .2s; flex-shrink:0;"><polyline points="6 9 12 15 18 9"/></svg>
+                </div>
+            </div>
+            <!-- Expandable details -->
+            <div id="ticket-detail-{{ forloop.counter }}" style="display:none; padding:0 1.25rem 1.25rem 1.25rem; border-top:1px solid #f1f5f9;">
+                <div style="padding-top:1rem; display:flex; flex-direction:column; gap:.85rem;">
+                    <div>
+                        <p style="font-size:.7rem; font-weight:600; color:#94a3b8; text-transform:uppercase; letter-spacing:.06em; margin-bottom:.3rem;">Description</p>
+                        <p style="font-size:.875rem; color:#334155; line-height:1.6;">{{ ticket.description }}</p>
+                    </div>
+                    {% if ticket.supervisor_reply %}
+                    <div style="background:#f0f9ff; border:1px solid #bae6fd; border-radius:.5rem; padding:.65rem .9rem;">
+                        <p style="font-size:.7rem; color:#0284c7; font-weight:600; text-transform:uppercase; letter-spacing:.07em; margin-bottom:.25rem;">Supervisor Reply</p>
+                        <p style="font-size:.875rem; color:#0c4a6e; line-height:1.6;">{{ ticket.supervisor_reply }}</p>
+                    </div>
+                    {% elif ticket.status == "RESOLVED" %}
+                    <div style="background:#fafafa; border:1px solid #e2e8f0; border-radius:.5rem; padding:.65rem .9rem;">
+                        <p style="font-size:.7rem; color:#94a3b8; font-weight:600; text-transform:uppercase; letter-spacing:.07em; margin-bottom:.25rem;">Supervisor Reply</p>
+                        <p style="font-size:.875rem; color:#94a3b8;">No reply added.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
     </div>
     {% else %}
     <div style="text-align:center; padding:3rem 2rem; color:#334155;">
@@ -110,6 +177,7 @@
 </div>
 
 <script>
+    // Tab switching
     document.querySelectorAll('.tab-btn[data-tab]').forEach(btn => {
         btn.addEventListener('click', () => {
             document.querySelectorAll('.tab-btn[data-tab]').forEach(b => b.classList.remove('active'));
@@ -120,5 +188,57 @@
             });
         });
     });
+
+    // Accordion — one open at a time
+    let openTask = null;
+    function toggleTask(index) {
+        const detail = document.getElementById('task-detail-' + index);
+        const chevron = document.getElementById('chevron-' + index);
+        const header = detail.previousElementSibling;
+
+        if (openTask !== null && openTask !== index) {
+            const prevDetail = document.getElementById('task-detail-' + openTask);
+            const prevChevron = document.getElementById('chevron-' + openTask);
+            const prevHeader = prevDetail.previousElementSibling;
+            prevDetail.style.display = 'none';
+            prevChevron.style.transform = 'rotate(0deg)';
+            prevHeader.style.background = '';
+        }
+
+        const isOpen = detail.style.display === 'block';
+        detail.style.display = isOpen ? 'none' : 'block';
+        chevron.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+        header.style.background = isOpen ? '' : '#f8fafc';
+        openTask = isOpen ? null : index;
+    }
+
+    // Hover effect on rows
+    document.querySelectorAll('.task-row-header').forEach(row => {
+        row.addEventListener('mouseenter', () => { if(row.style.background !== 'rgb(248, 250, 252)') row.style.background = '#fafafa'; });
+        row.addEventListener('mouseleave', () => { if(row.style.background !== 'rgb(248, 250, 252)') row.style.background = ''; });
+    });
+
+    // Ticket accordion — one open at a time
+    let openTicket = null;
+    function toggleTicket(index) {
+        const detail = document.getElementById('ticket-detail-' + index);
+        const chevron = document.getElementById('tchevron-' + index);
+        const header = detail.previousElementSibling;
+
+        if (openTicket !== null && openTicket !== index) {
+            const prevDetail = document.getElementById('ticket-detail-' + openTicket);
+            const prevChevron = document.getElementById('tchevron-' + openTicket);
+            const prevHeader = prevDetail.previousElementSibling;
+            prevDetail.style.display = 'none';
+            prevChevron.style.transform = 'rotate(0deg)';
+            prevHeader.style.background = '';
+        }
+
+        const isOpen = detail.style.display === 'block';
+        detail.style.display = isOpen ? 'none' : 'block';
+        chevron.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+        header.style.background = isOpen ? '' : '#f8fafc';
+        openTicket = isOpen ? null : index;
+    }
 </script>
 {% endblock %}

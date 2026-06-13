@@ -469,6 +469,7 @@ def resolve_ticket(request, token_id):
     ticket = get_object_or_404(Ticket, token_id=token_id, department=allowed_dept)
     if request.method == "POST":
         ticket.status = Ticket.Status.RESOLVED
+        ticket.supervisor_reply = request.POST.get("supervisor_reply", "").strip() or None
         ticket.save()
         messages.success(request, "Ticket resolved.")
     return redirect("tasks")

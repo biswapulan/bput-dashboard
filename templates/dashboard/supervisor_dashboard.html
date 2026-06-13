@@ -176,6 +176,10 @@
                 </div>
                 <form method="post" action="{% url 'resolve-ticket' ticket.token_id %}">
                     {% csrf_token %}
+                    <div style="margin-bottom:.65rem;">
+                        <label style="font-size:.7rem; font-weight:600; color:#94a3b8; text-transform:uppercase; letter-spacing:.06em; display:block; margin-bottom:.35rem;">Reply to Intern <span style="color:#cbd5e1; font-weight:400; text-transform:none;">(optional)</span></label>
+                        <textarea name="supervisor_reply" rows="2" placeholder="Type your solution or reply here…" style="width:100%; font-size:.84rem; color:#334155; border:1px solid #e2e8f0; border-radius:.5rem; padding:.5rem .75rem; resize:vertical; font-family:inherit; outline:none; box-sizing:border-box;"></textarea>
+                    </div>
                     <button type="submit" class="btn btn-success btn-sm">Mark Resolved</button>
                 </form>
             </div>

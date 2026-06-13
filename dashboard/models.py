@@ -179,6 +179,7 @@ class Ticket(models.Model):
     subject = models.CharField(max_length=180)
     description = models.TextField()
     status = models.CharField(max_length=16, choices=Status.choices, default=Status.OPEN, db_index=True)
+    supervisor_reply = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
 
     class Meta:
