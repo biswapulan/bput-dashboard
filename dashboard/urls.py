@@ -33,6 +33,7 @@ urlpatterns = [
     path("dashboard/intern/attendance/", views.intern_attendance, name="intern-attendance"),
     path("dashboard/intern/tasks/<str:task_id>/submit/", views.submit_task, name="submit-task"),
     path("dashboard/intern/raise-ticket/", views.raise_ticket, name="raise-ticket"),
+    path("dashboard/intern/cms/", views.cms_tools, name="cms-tools"),
 
     # Profile
     path("profile/", views.profile, name="profile"),

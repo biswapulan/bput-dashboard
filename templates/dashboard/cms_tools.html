@@ -1,0 +1,776 @@
+{% extends "base.html" %}
+{% block title %}CMS Submissions{% endblock %}
+{% block nav_cms_tools %}active{% endblock %}
+
+{% block extra_head %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
+<style>
+    #cms-page h2, #cms-page h3.cms-subhead {
+        font-family: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+    }
+
+    /* Tab content panels */
+    #cms-page .cms-tab { display: none; }
+    #cms-page .cms-tab.active { display: block; }
+
+    /* Instructions dropdown */
+    #cms-page .info-drop {
+        max-width: 480px;
+        border: 1px solid #e2e8f0;
+        background: #f8fafc;
+        border-radius: 8px;
+        margin-bottom: 14px;
+    }
+    #cms-page .info-drop summary {
+        list-style: none;
+        cursor: pointer;
+        padding: 9px 12px;
+        font-size: 13px;
+        font-weight: 500;
+        color: #0f172a;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    #cms-page .info-drop summary::-webkit-details-marker { display: none; }
+    #cms-page .info-drop summary::before {
+        content: "+";
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 16px;
+        height: 16px;
+        border: 1px solid #4f46e5;
+        color: #4f46e5;
+        border-radius: 3px;
+        font-size: 12px;
+        line-height: 1;
+        flex-shrink: 0;
+    }
+    #cms-page .info-drop[open] summary::before { content: "\2212"; }
+    #cms-page .info-drop ol {
+        margin: 0;
+        padding: 0 14px 12px 34px;
+        font-size: 13px;
+        color: #475569;
+        line-height: 1.7;
+    }
+    #cms-page .info-drop ol li + li { margin-top: 2px; }
+
+    /* Form elements */
+    #cms-page .form-group { margin-bottom: 18px; }
+    #cms-page .form-group label {
+        display: block;
+        font-size: 12px;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 5px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+    #cms-page .form-group input[type="text"],
+    #cms-page .form-group select,
+    #cms-page .form-group textarea {
+        width: 100%;
+        max-width: 480px;
+        padding: 9px 11px;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        font-size: 14px;
+        font-family: inherit;
+        color: #0f172a;
+        background: #fff;
+        outline: none;
+        appearance: none;
+        -webkit-appearance: none;
+    }
+    #cms-page .form-group select {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236B7280' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+        padding-right: 30px;
+    }
+    #cms-page .form-group input:focus,
+    #cms-page .form-group select:focus,
+    #cms-page .form-group textarea:focus {
+        border-color: #4f46e5;
+    }
+    #cms-page .form-group textarea { min-height: 80px; resize: vertical; }
+
+    /* Buttons + spinner */
+    #cms-page .btn-container { display: flex; align-items: center; gap: 12px; }
+    #cms-page .inline-spinner {
+        display: none;
+        width: 18px;
+        height: 18px;
+        border: 2px solid #cbd5e1;
+        border-radius: 50%;
+        border-top-color: #4f46e5;
+        animation: cms-spin 0.8s linear infinite;
+    }
+    @keyframes cms-spin { to { transform: rotate(360deg); } }
+
+    /* Alerts */
+    #cms-page .alert {
+        max-width: 480px;
+        padding: 10px 14px;
+        font-size: 13px;
+        margin-top: 16px;
+        border: 1px solid;
+        border-radius: 8px;
+        display: none;
+    }
+    #cms-page .alert.visible { display: block; }
+    #cms-page .alert-error { color: #9f1239; border-color: #fecdd3; background: #fff1f2; }
+    #cms-page .alert-success { color: #166534; border-color: #bbf7d0; background: #f0fdf4; }
+    #cms-page .alert-info { color: #1d4ed8; border-color: #93c5fd; background: #eff6ff; }
+
+    #cms-page .field-hint { font-size: 12px; color: #64748b; margin-top: 6px; }
+
+    /* Tables */
+    #cms-page .data-table-wrap { overflow-x: auto; margin-top: 20px; }
+    #cms-page .data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    #cms-page .data-table th {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        padding: 8px 12px;
+        text-align: left;
+        font-weight: 600;
+        color: #0f172a;
+        white-space: nowrap;
+    }
+    #cms-page .data-table td {
+        border: 1px solid #e2e8f0;
+        padding: 8px 12px;
+        color: #334155;
+        vertical-align: top;
+    }
+    #cms-page .data-table tr:nth-child(even) td { background: #fafbff; }
+    #cms-page .data-table tr:hover td { background: #eff6ff; }
+    #cms-page .data-table td a { color: #4f46e5; text-decoration: none; font-weight: 500; }
+    #cms-page .data-table td a:hover { text-decoration: underline; }
+
+    /* My Submissions */
+    #cms-page .search-row { display: flex; align-items: center; gap: 10px; max-width: 480px; }
+    #cms-page .search-row input {
+        flex: 1;
+        padding: 9px 11px;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        font-size: 14px;
+        font-family: inherit;
+        color: #0f172a;
+        outline: none;
+    }
+    #cms-page .search-row input:focus { border-color: #4f46e5; }
+
+    #cms-page .section-divider { border: none; border-top: 1px solid #e2e8f0; margin: 32px 0; }
+    #cms-page .empty-state { font-size: 13px; color: #64748b; margin-top: 16px; }
+    #cms-page .loading-container { display: flex; align-items: center; gap: 8px; margin-top: 12px; }
+    #cms-page .loading-text { font-size: 13px; color: #64748b; }
+
+    /* Help panel */
+    #cms-page .help-panel-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; max-width: 420px; margin-top: 8px; overflow: hidden; }
+    #cms-page .help-panel-row { display: flex; align-items: center; gap: 12px; padding: 16px 20px; font-size: 14px; }
+    #cms-page .help-panel-row + .help-panel-row { border-top: 1px solid #f1f5f9; }
+    #cms-page .help-panel-icon { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    #cms-page .help-panel-icon.wa { background: #dcfce7; }
+    #cms-page .help-panel-icon.em { background: #eff6ff; }
+    #cms-page .help-panel-text-label { font-size: 11px; font-weight: 600; color: #94a3b8; letter-spacing: 0.06em; text-transform: uppercase; }
+    #cms-page .help-panel-text-value { font-size: 14px; font-weight: 500; color: #0f172a; }
+    #cms-page .help-panel-text-value a { color: #4f46e5; text-decoration: none; }
+    #cms-page .help-panel-text-value a:hover { text-decoration: underline; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div id="cms-page">
+
+    <div class="page-header">
+        <div>
+            <h1>CMS Submissions</h1>
+            <p>Submit syllabus &amp; notes entries to the content management sheet, and track your submission history.</p>
+        </div>
+    </div>
+
+    <!-- Tabs -->
+    <div style="display:flex; gap:.6rem; margin-bottom:1.75rem; border:1px solid #e2e8f0; padding-bottom:1rem;">
+        <button class="tab-btn active" data-tab="syllabus">Syllabus Entry</button>
+        <button class="tab-btn" data-tab="notes">Notes Entry</button>
+        <button class="tab-btn" data-tab="submissions">My Submissions</button>
+        <button class="tab-btn" data-tab="help">Help</button>
+    </div>
+
+    <!-- SYLLABUS ENTRY -->
+    <div id="cms-tab-syllabus" class="cms-tab active card">
+        <h2 style="font-size:21px; font-weight:700; color:#0f172a; margin-bottom:8px;">Syllabus Entry</h2>
+        <p style="font-size:13px; color:#64748b; margin-bottom:24px; padding-bottom:18px; border-bottom:1px solid #e2e8f0; max-width:560px;">
+            Submit a new subject for the department syllabus. Duplicate entries are automatically blocked.
+        </p>
+
+        <div class="form-group">
+            <label for="syl-dept">Department</label>
+            <select id="syl-dept">
+                <option value="">Select department</option>
+                <option>Computer Science (CSE)</option>
+                <option>Civil Engineering (Civil)</option>
+                <option>Electrical Engineering (EEE)</option>
+                <option>Mechanical Engineering (Mech)</option>
+                <option>Mining Engineering (Mining)</option>
+                <option>Metallurgy (Metal)</option>
+                <option>Mineral Engineering (Mineral)</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="syl-sem">Semester</label>
+            <select id="syl-sem">
+                <option value="">Select semester</option>
+                <option>Semester 1</option>
+                <option>Semester 2</option>
+                <option>Semester 3</option>
+                <option>Semester 4</option>
+                <option>Semester 5</option>
+                <option>Semester 6</option>
+                <option>Semester 7</option>
+                <option>Semester 8</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="syl-subject-name">Subject Name</label>
+            <input type="text" id="syl-subject-name" placeholder="e.g. Engineering Mathematics I" />
+        </div>
+
+        <div class="form-group">
+            <label for="syl-subject-code">Subject Code</label>
+            <input type="text" id="syl-subject-code" placeholder="e.g. MA101" />
+        </div>
+
+        <div class="form-group">
+            <label for="syl-drive-link">Syllabus Drive Link</label>
+            <details class="info-drop">
+                <summary>How to get a shareable link from Google Drive</summary>
+                <ol>
+                    <li>Upload the syllabus PDF to your own Google Drive.</li>
+                    <li>Right-click the file, choose Share, then set access to "Anyone with the link".</li>
+                    <li>Copy the link and paste it in the field below.</li>
+                </ol>
+            </details>
+            <input type="text" id="syl-drive-link" placeholder="https://drive.google.com/file/d/..." />
+            <div class="field-hint">Make sure sharing is set to "Anyone with the link" before submitting.</div>
+        </div>
+
+        <div class="btn-container">
+            <button class="btn btn-primary" id="syl-submit-btn" onclick="cmsSubmitSyllabus()">Submit</button>
+            <div class="inline-spinner" id="syl-spinner"></div>
+        </div>
+
+        <div id="syl-error" class="alert alert-error"></div>
+        <div id="syl-success" class="alert alert-success"></div>
+    </div>
+
+    <!-- NOTES ENTRY -->
+    <div id="cms-tab-notes" class="cms-tab card">
+        <h2 style="font-size:21px; font-weight:700; color:#0f172a; margin-bottom:8px;">Notes Entry</h2>
+        <p style="font-size:13px; color:#64748b; margin-bottom:24px; padding-bottom:18px; border-bottom:1px solid #e2e8f0; max-width:560px;">
+            Upload study notes for a subject. Only one notes file is accepted per subject per semester.
+        </p>
+
+        <div class="form-group">
+            <label for="notes-dept">Department</label>
+            <select id="notes-dept" onchange="cmsOnNotesDeptOrSemChange()">
+                <option value="">Select department</option>
+                <option>Computer Science (CSE)</option>
+                <option>Civil Engineering (Civil)</option>
+                <option>Electrical Engineering (EEE)</option>
+                <option>Mechanical Engineering (Mech)</option>
+                <option>Mining Engineering (Mining)</option>
+                <option>Metallurgy (Metal)</option>
+                <option>Mineral Engineering (Mineral)</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="notes-sem">Semester</label>
+            <select id="notes-sem" onchange="cmsOnNotesDeptOrSemChange()">
+                <option value="">Select semester</option>
+                <option>Semester 1</option>
+                <option>Semester 2</option>
+                <option>Semester 3</option>
+                <option>Semester 4</option>
+                <option>Semester 5</option>
+                <option>Semester 6</option>
+                <option>Semester 7</option>
+                <option>Semester 8</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="notes-subject">Subject Name</label>
+            <select id="notes-subject">
+                <option value="">Select department and semester first</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="notes-drive-link">Notes Drive Link</label>
+            <details class="info-drop">
+                <summary>How to get a shareable link from Google Drive</summary>
+                <ol>
+                    <li>Upload the notes PDF to your own Google Drive.</li>
+                    <li>Right-click the file, choose Share, then set access to "Anyone with the link".</li>
+                    <li>Copy the link and paste it in the field below.</li>
+                </ol>
+            </details>
+            <input type="text" id="notes-drive-link" placeholder="https://drive.google.com/file/d/..." />
+            <div class="field-hint">Make sure sharing is set to "Anyone with the link" before submitting.</div>
+        </div>
+
+        <div class="form-group">
+            <label for="notes-description">Description (optional)</label>
+            <textarea id="notes-description" placeholder="Brief description of the file contents..."></textarea>
+        </div>
+
+        <div class="btn-container">
+            <button class="btn btn-primary" id="notes-submit-btn" onclick="cmsSubmitNotes()">Submit</button>
+            <div class="inline-spinner" id="notes-spinner"></div>
+        </div>
+
+        <div id="notes-error" class="alert alert-error"></div>
+        <div id="notes-success" class="alert alert-success"></div>
+    </div>
+
+    <!-- MY SUBMISSIONS -->
+    <div id="cms-tab-submissions" class="cms-tab card">
+        <h2 style="font-size:21px; font-weight:700; color:#0f172a; margin-bottom:8px;">My Submissions</h2>
+        <p style="font-size:13px; color:#64748b; margin-bottom:24px; padding-bottom:18px; border-bottom:1px solid #e2e8f0; max-width:560px;">
+            Search for any submission by ID, or view all submissions associated with your intern account.
+        </p>
+
+        <h3 class="cms-subhead" style="font-size:13px; font-weight:600; margin-bottom:12px; color:#374151; text-transform:uppercase; letter-spacing:0.04em; font-family:inherit;">Search by Submission ID</h3>
+        <div class="search-row">
+            <input type="text" id="search-id-input" placeholder="e.g. CSE-3-SYL-0001" />
+            <div class="btn-container">
+                <button class="btn btn-primary" id="search-btn" onclick="cmsSearchById()">Search</button>
+                <div class="inline-spinner" id="search-spinner"></div>
+            </div>
+        </div>
+
+        <div id="search-error" class="alert alert-error" style="margin-top:12px;"></div>
+
+        <div id="search-result-wrap" class="data-table-wrap" style="display:none;">
+            <table class="data-table" id="search-result-table">
+                <thead>
+                    <tr>
+                        <th>Submission ID</th>
+                        <th>Intern Name</th>
+                        <th>Intern ID</th>
+                        <th>Type</th>
+                        <th>Department</th>
+                        <th>Semester</th>
+                        <th>Subject</th>
+                        <th>Drive Link</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                    </tr>
+                </thead>
+                <tbody id="search-result-body"></tbody>
+            </table>
+        </div>
+
+        <hr class="section-divider" />
+
+        <h3 class="cms-subhead" style="font-size:13px; font-weight:600; margin-bottom:12px; color:#374151; text-transform:uppercase; letter-spacing:0.04em; font-family:inherit;">My Submission History</h3>
+        <div class="loading-container" id="history-loading">
+            <div class="inline-spinner" style="display:block;"></div>
+            <p class="loading-text">Loading your submissions...</p>
+        </div>
+        <p class="empty-state" id="history-empty" style="display:none;">No submissions found.</p>
+
+        <div id="history-table-wrap" class="data-table-wrap" style="display:none;">
+            <table class="data-table" id="history-table">
+                <thead>
+                    <tr>
+                        <th>Submission ID</th>
+                        <th>Type</th>
+                        <th>Department</th>
+                        <th>Semester</th>
+                        <th>Subject</th>
+                        <th>Drive Link</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody id="history-body"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- HELP -->
+    <div id="cms-tab-help" class="cms-tab card">
+        <h2 style="font-size:21px; font-weight:700; color:#0f172a; margin-bottom:8px;">Help &amp; Support</h2>
+        <p style="font-size:13px; color:#64748b; margin-bottom:24px; padding-bottom:18px; border-bottom:1px solid #e2e8f0; max-width:560px;">
+            Reach out to us for any issues with syllabus/notes submissions or the CMS sheet.
+        </p>
+
+        <div class="help-panel-card">
+            <div class="help-panel-row">
+                <div class="help-panel-icon wa">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" fill="#16A34A"/>
+                        <path d="M11.989 2C6.476 2 2 6.477 2 11.989c0 1.79.469 3.467 1.287 4.921L2 22l5.244-1.258A9.96 9.96 0 0011.989 22C17.522 22 22 17.522 22 11.989 22 6.477 17.522 2 11.989 2zm0 18.18a8.168 8.168 0 01-4.169-1.144l-.299-.178-3.108.747.78-3.026-.196-.312A8.146 8.146 0 013.82 11.99c0-4.509 3.67-8.18 8.169-8.18 4.5 0 8.17 3.671 8.17 8.17s-3.67 8.2-8.17 8.2z" fill="#16A34A"/>
+                    </svg>
+                </div>
+                <div>
+                    <div class="help-panel-text-label">WhatsApp</div>
+                    <div class="help-panel-text-value"><a href="https://wa.me/918249185682">8249185682</a></div>
+                </div>
+            </div>
+            <div class="help-panel-row">
+                <div class="help-panel-icon em">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" fill="#2563EB"/>
+                    </svg>
+                </div>
+                <div>
+                    <div class="help-panel-text-label">Email</div>
+                    <div class="help-panel-text-value"><a href="mailto:community@bputnotes.in">community@bputnotes.in</a></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+// ============================================================
+// CONFIGURATION — same Google Sheets backend as before
+// ============================================================
+var CMS_CONFIG = {
+    APPS_SCRIPT_URL: "https://script.google.com/macros/s/AKfycbyTqoJ7eAx3o8fSmYGOFZiUMuDFUus7W4wRBWZtciS9XVlaAKv6WnxKK1szmGIJ7rQ_Hg/exec"
+};
+
+// Identity now comes from the logged-in Django account instead of the
+// separate CSV-based login that the standalone CMS page used to have.
+var cmsSession = {
+    internName: "{{ request.user.get_full_name|default:request.user.username|escapejs }}",
+    internId: "{{ request.user.intern_id|default:''|escapejs }}"
+};
+
+// ============================================================
+// TAB SWITCHING
+// ============================================================
+document.querySelectorAll('#cms-page .tab-btn[data-tab]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('#cms-page .tab-btn[data-tab]').forEach(function(b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        var t = btn.getAttribute('data-tab');
+        ['syllabus', 'notes', 'submissions', 'help'].forEach(function(name) {
+            var el = document.getElementById('cms-tab-' + name);
+            if (name === t) { el.classList.add('active'); } else { el.classList.remove('active'); }
+        });
+        if (t === 'submissions') cmsLoadMySubmissions();
+    });
+});
+
+// ============================================================
+// API UTILITY
+// ============================================================
+function cmsCallAPI(payload) {
+    return fetch(CMS_CONFIG.APPS_SCRIPT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain" },
+        body: JSON.stringify(payload)
+    }).then(function(res) {
+        if (!res.ok) throw new Error("Server infrastructure response status error.");
+        return res.json();
+    });
+}
+
+function cmsShowAlert(id, msg, type) {
+    var el = document.getElementById(id);
+    el.textContent = msg;
+    el.className = "alert alert-" + type + " visible";
+}
+
+function cmsHideAlert(id) {
+    var el = document.getElementById(id);
+    el.className = "alert";
+    el.textContent = "";
+}
+
+function cmsEsc(str) {
+    if (str == null) return "";
+    return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+}
+
+function cmsDriveLinkCell(url) {
+    if (url && url.toString().indexOf("http") === 0) {
+        return "<a href=\"" + cmsEsc(url) + "\" target=\"_blank\" rel=\"noopener noreferrer\">View File</a>";
+    }
+    return url ? cmsEsc(url) : "<span style=\"color:#9CA3AF;\">—</span>";
+}
+
+// ============================================================
+// SYLLABUS ENTRY
+// ============================================================
+function cmsSubmitSyllabus() {
+    var dept = document.getElementById("syl-dept").value;
+    var sem = document.getElementById("syl-sem").value;
+    var name = document.getElementById("syl-subject-name").value.trim();
+    var code = document.getElementById("syl-subject-code").value.trim();
+    var driveLink = document.getElementById("syl-drive-link").value.trim();
+    var btn = document.getElementById("syl-submit-btn");
+    var spinner = document.getElementById("syl-spinner");
+
+    cmsHideAlert("syl-error");
+    cmsHideAlert("syl-success");
+
+    if (!dept) { cmsShowAlert("syl-error", "Please select a department.", "error"); return; }
+    if (!sem) { cmsShowAlert("syl-error", "Please select a semester.", "error"); return; }
+    if (!name) { cmsShowAlert("syl-error", "Please enter a subject name.", "error"); return; }
+    if (!code) { cmsShowAlert("syl-error", "Please enter a subject code.", "error"); return; }
+    if (!driveLink) { cmsShowAlert("syl-error", "Please paste the syllabus Drive link.", "error"); return; }
+
+    btn.disabled = true;
+    spinner.style.display = "block";
+    btn.textContent = "Checking...";
+
+    cmsCallAPI({ action: "checkSyllabus", department: dept, semester: sem, subjectCode: code })
+        .then(function(res) {
+            if (res.exists) {
+                cmsShowAlert("syl-error", "This subject already exists. Submission blocked.", "error");
+                return null;
+            }
+            btn.textContent = "Submitting...";
+            return cmsCallAPI({
+                action: "submitSyllabus",
+                department: dept,
+                semester: sem,
+                subjectName: name,
+                subjectCode: code,
+                driveFileLink: driveLink,
+                submittedBy: cmsSession.internName,
+                internId: cmsSession.internId
+            });
+        })
+        .then(function(res) {
+            if (!res) return;
+            if (res.success) {
+                cmsShowAlert("syl-success", "Submitted successfully. Submission ID: " + res.submissionId, "success");
+                document.getElementById("syl-dept").value = "";
+                document.getElementById("syl-sem").value = "";
+                document.getElementById("syl-subject-name").value = "";
+                document.getElementById("syl-subject-code").value = "";
+                document.getElementById("syl-drive-link").value = "";
+            } else {
+                cmsShowAlert("syl-error", "Submission failure: " + (res.error || "Unknown response state."), "error");
+            }
+        })
+        .catch(function(err) {
+            cmsShowAlert("syl-error", "Network execution conflict: " + err.message, "error");
+        })
+        .finally(function() {
+            btn.disabled = false;
+            spinner.style.display = "none";
+            btn.textContent = "Submit";
+        });
+}
+
+// ============================================================
+// NOTES ENTRY
+// ============================================================
+function cmsOnNotesDeptOrSemChange() {
+    var dept = document.getElementById("notes-dept").value;
+    var sem = document.getElementById("notes-sem").value;
+    var subjectSelect = document.getElementById("notes-subject");
+
+    subjectSelect.innerHTML = '<option value="">Loading subjects...</option>';
+
+    if (!dept || !sem) {
+        subjectSelect.innerHTML = '<option value="">Select department and semester first</option>';
+        return;
+    }
+
+    cmsCallAPI({ action: "getSubjects", department: dept, semester: sem })
+        .then(function(res) {
+            subjectSelect.innerHTML = '<option value="">Select a subject</option>';
+            if (res.subjects && res.subjects.length > 0) {
+                res.subjects.forEach(function(subj) {
+                    var opt = document.createElement("option");
+                    opt.value = subj;
+                    opt.textContent = subj;
+                    subjectSelect.appendChild(opt);
+                });
+            } else {
+                subjectSelect.innerHTML = '<option value="">No subjects found for this selection</option>';
+            }
+        })
+        .catch(function() {
+            subjectSelect.innerHTML = '<option value="">Error loading subjects</option>';
+        });
+}
+
+function cmsSubmitNotes() {
+    var dept = document.getElementById("notes-dept").value;
+    var sem = document.getElementById("notes-sem").value;
+    var subject = document.getElementById("notes-subject").value;
+    var driveLink = document.getElementById("notes-drive-link").value.trim();
+    var desc = document.getElementById("notes-description").value.trim();
+    var btn = document.getElementById("notes-submit-btn");
+    var spinner = document.getElementById("notes-spinner");
+
+    cmsHideAlert("notes-error");
+    cmsHideAlert("notes-success");
+
+    if (!dept) { cmsShowAlert("notes-error", "Please select a department.", "error"); return; }
+    if (!sem) { cmsShowAlert("notes-error", "Please select a semester.", "error"); return; }
+    if (!subject) { cmsShowAlert("notes-error", "Please select a subject.", "error"); return; }
+    if (!driveLink) { cmsShowAlert("notes-error", "Please paste the notes Drive link.", "error"); return; }
+
+    btn.disabled = true;
+    spinner.style.display = "block";
+    btn.textContent = "Checking...";
+
+    cmsCallAPI({ action: "checkNotes", department: dept, semester: sem, subjectName: subject })
+        .then(function(res) {
+            if (res.exists) {
+                cmsShowAlert("notes-error", "Notes for this subject already exist. Submission blocked.", "error");
+                return null;
+            }
+            btn.textContent = "Submitting...";
+            return cmsCallAPI({
+                action: "submitNotes",
+                department: dept,
+                semester: sem,
+                subjectName: subject,
+                driveFileLink: driveLink,
+                description: desc,
+                submittedBy: cmsSession.internName,
+                internId: cmsSession.internId
+            });
+        })
+        .then(function(res) {
+            if (!res) return;
+            if (res.success) {
+                cmsShowAlert("notes-success", "Submitted successfully. Submission ID: " + res.submissionId, "success");
+                document.getElementById("notes-dept").value = "";
+                document.getElementById("notes-sem").value = "";
+                document.getElementById("notes-subject").innerHTML = '<option value="">Select department and semester first</option>';
+                document.getElementById("notes-drive-link").value = "";
+                document.getElementById("notes-description").value = "";
+            } else {
+                cmsShowAlert("notes-error", "Submission failure: " + (res.error || "Unknown response state."), "error");
+            }
+        })
+        .catch(function(err) {
+            cmsShowAlert("notes-error", "Network execution conflict: " + err.message, "error");
+        })
+        .finally(function() {
+            btn.disabled = false;
+            spinner.style.display = "none";
+            btn.textContent = "Submit";
+        });
+}
+
+// ============================================================
+// MY SUBMISSIONS
+// ============================================================
+function cmsLoadMySubmissions() {
+    var loadingEl = document.getElementById("history-loading");
+    var emptyEl = document.getElementById("history-empty");
+    var tableWrap = document.getElementById("history-table-wrap");
+    var tbody = document.getElementById("history-body");
+
+    loadingEl.style.display = "flex";
+    emptyEl.style.display = "none";
+    tableWrap.style.display = "none";
+    tbody.innerHTML = "";
+
+    cmsCallAPI({ action: "getSubmissions", internId: cmsSession.internId })
+        .then(function(res) {
+            if (!res.submissions || res.submissions.length === 0) {
+                emptyEl.style.display = "block";
+                return;
+            }
+            res.submissions.forEach(function(row) {
+                var tr = document.createElement("tr");
+                tr.innerHTML =
+                    "<td>" + cmsEsc(row.submissionId) + "</td>" +
+                    "<td>" + cmsEsc(row.type) + "</td>" +
+                    "<td>" + cmsEsc(row.department) + "</td>" +
+                    "<td>" + cmsEsc(row.semester) + "</td>" +
+                    "<td>" + cmsEsc(row.subjectName) + "</td>" +
+                    "<td>" + cmsDriveLinkCell(row.driveLink) + "</td>" +
+                    "<td>" + cmsEsc(row.date) + "</td>";
+                tbody.appendChild(tr);
+            });
+            tableWrap.style.display = "block";
+        })
+        .catch(function(err) {
+            loadingEl.innerHTML = '<p class="loading-text" style="color:#B91C1C;">Failed to load data string: ' + cmsEsc(err.message) + '</p>';
+        })
+        .finally(function() {
+            if (loadingEl.querySelector('.inline-spinner')) {
+                loadingEl.style.display = "none";
+            }
+        });
+}
+
+function cmsSearchById() {
+    var idInput = document.getElementById("search-id-input").value.trim();
+    var resultWrap = document.getElementById("search-result-wrap");
+    var tbody = document.getElementById("search-result-body");
+    var btn = document.getElementById("search-btn");
+    var spinner = document.getElementById("search-spinner");
+
+    cmsHideAlert("search-error");
+    resultWrap.style.display = "none";
+    tbody.innerHTML = "";
+
+    if (!idInput) {
+        cmsShowAlert("search-error", "Please enter a Submission ID to search.", "error");
+        return;
+    }
+
+    btn.disabled = true;
+    spinner.style.display = "block";
+
+    cmsCallAPI({ action: "searchSubmission", submissionId: idInput })
+        .then(function(res) {
+            if (!res.found) {
+                cmsShowAlert("search-error", "No submission found with ID: " + idInput, "error");
+                return;
+            }
+            var row = res.submission;
+            var tr = document.createElement("tr");
+            tr.innerHTML =
+                "<td>" + cmsEsc(row.submissionId) + "</td>" +
+                "<td>" + cmsEsc(row.internName) + "</td>" +
+                "<td>" + cmsEsc(row.internId) + "</td>" +
+                "<td>" + cmsEsc(row.type) + "</td>" +
+                "<td>" + cmsEsc(row.department) + "</td>" +
+                "<td>" + cmsEsc(row.semester) + "</td>" +
+                "<td>" + cmsEsc(row.subjectName) + "</td>" +
+                "<td>" + cmsDriveLinkCell(row.driveLink) + "</td>" +
+                "<td>" + cmsEsc(row.date) + "</td>" +
+                "<td>" + cmsEsc(row.time) + "</td>";
+            tbody.appendChild(tr);
+            resultWrap.style.display = "block";
+        })
+        .catch(function(err) {
+            cmsShowAlert("search-error", "Search operation failure: " + err.message, "error");
+        })
+        .finally(function() {
+            btn.disabled = false;
+            spinner.style.display = "none";
+        });
+}
+</script>
+{% endblock %}

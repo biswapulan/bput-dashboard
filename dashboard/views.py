@@ -570,6 +570,13 @@ def raise_ticket(request):
     return render(request, "dashboard/raise_ticket.html", {"form": form, **counts})
 
 
+@role_required(CustomUser.Role.CONTENT_INTERN)
+def cms_tools(request):
+    """Content Management submission tools (syllabus / notes entry, backed by Google Sheets)."""
+    counts = get_unread_counts(request.user)
+    return render(request, "dashboard/cms_tools.html", {**counts})
+
+
 # ─── Profile ───────────────────────────────────────────────────────────────────
 
 @login_required
