@@ -604,6 +604,11 @@
             .row-task .row-task-title {
                 grid-column: 1 / -1;
             }
+
+            /* ── Phase 8: Hide column-label header row on mobile (cards replace it) ── */
+            .row-task.row-task-header {
+                display: none;
+            }
         }
     </style>
     {% block extra_head %}{% endblock %}
