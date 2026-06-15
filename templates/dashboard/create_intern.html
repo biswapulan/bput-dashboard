@@ -4,13 +4,13 @@
 {% block content %}
 <div class="page-header">
     <div>
-        <h1> Create Intern Account</h1>
+        <h1>🎓 Create Intern Account</h1>
         <p>Register a new intern — ID is auto-generated on save</p>
     </div>
 </div>
 <div style="max-width:720px;">
     <div class="card">
-        <form method="post" style="display:grid; grid-template-columns:1fr 1fr; gap:1.25rem 1.5rem;">
+        <form method="post" class="split-2" style="gap:1.25rem 1.5rem;">
             {% csrf_token %}
             {% for field in form %}
             <div {% if field.name == "password1" or field.name == "password2" %}style="grid-column:1/-1"{% endif %}>

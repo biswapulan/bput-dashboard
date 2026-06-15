@@ -18,16 +18,16 @@
             <tbody>
                 {% for u in users %}
                 <tr>
-                    <td>
+                    <td data-label="Username">
                         <span style="font-weight:600; color:#0f172a; font-size:.88rem;">{{ u.get_full_name|default:u.username }}</span>
                         {% if u.get_full_name %}<br><span style="font-size:.72rem; color:#64748b;">@{{ u.username }}</span>{% endif %}
                     </td>
-                    <td style="font-family:monospace; color:#4f46e5; font-size:.78rem;">{{ u.intern_id|default:"—" }}</td>
-                    <td><span class="badge badge-pending" style="background:#eef2ff; color:#4f46e5; border-color:#3730a3;">{{ u.get_role_display }}</span></td>
-                    <td style="font-size:.8rem; color:#64748b;">{{ u.get_department_display|default:"—" }}</td>
-                    <td style="font-size:.8rem; color:#64748b;">{{ u.college_name|default:"—" }}</td>
-                    <td style="font-size:.75rem; color:#64748b; white-space:nowrap;">{{ u.date_of_joining|date:"M d, Y" }}</td>
-                    <td>
+                    <td data-label="Role" style="font-family:monospace; color:#4f46e5; font-size:.78rem;">{{ u.intern_id|default:"—" }}</td>
+                    <td data-label="Intern ID"><span class="badge badge-pending" style="background:#eef2ff; color:#4f46e5; border-color:#3730a3;">{{ u.get_role_display }}</span></td>
+                    <td data-label="Department" style="font-size:.8rem; color:#64748b;">{{ u.get_department_display|default:"—" }}</td>
+                    <td data-label="Year" style="font-size:.8rem; color:#64748b;">{{ u.college_name|default:"—" }}</td>
+                    <td data-label="College" style="font-size:.75rem; color:#64748b; white-space:nowrap;">{{ u.date_of_joining|date:"M d, Y" }}</td>
+                    <td data-label="Date Joined">
                         {% if u.pk != request.user.pk %}
                         <form method="post" action="{% url 'delete-user' u.pk %}" onsubmit="return confirm('Delete {{ u.username }}?');">
                             {% csrf_token %}

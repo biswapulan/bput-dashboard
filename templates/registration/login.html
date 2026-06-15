@@ -9,13 +9,13 @@
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         html, body {
-            height: 100%;
+            min-height: 100%;
             font-family: 'Inter', system-ui, sans-serif;
             background: #ffffff;
             color: #0f172a;
         }
-        
-        /* OUTER PAGE FRAMEWORK: Grid matrix lines configured to prominent, solid dark black lines */
+
+        /* ── PAGE BACKGROUND ── */
         .page {
             min-height: 100vh;
             display: flex;
@@ -23,33 +23,27 @@
             justify-content: center;
             padding: 2rem 1rem;
             background-color: #ffffff;
-            background-image: 
-                /* Sharp Horizontal Net Lines (Pure Dark Black) */
+            background-image:
                 linear-gradient(rgba(0, 0, 0, 0.18) 1.5px, transparent 1.5px),
-                /* Sharp Vertical Net Lines (Pure Dark Black) */
                 linear-gradient(90deg, rgba(0, 0, 0, 0.18) 1.5px, transparent 1.5px),
-                /* Clean High-Value Canvas Base */
                 linear-gradient(135deg, #f5f7ff 0%, #ffffff 50%, #f8fafc 100%);
-            background-size: 36px 36px, 36px 36px, 100% 100%; /* Dimensions of outer grid net pattern */
+            background-size: 36px 36px, 36px 36px, 100% 100%;
             position: relative;
             overflow: hidden;
         }
-        
-        /* =========================================
-           CYBER TRAIN BACKGROUND STYLES (OPTION 2: GAP ALIGNED)
-        ========================================= */
+
+        /* ── TRAIN BACKGROUND ── */
         .train-background {
             position: absolute;
             inset: 0;
             overflow: hidden;
             pointer-events: none;
-            z-index: 20; /* Stays on top to look sharp, but sits in the gaps */
+            z-index: 20;
         }
 
-        /* --- TOP TRAIN (Right to Left - Glides in Top Gap) --- */
         .rail-line-top {
             position: absolute;
-            top: calc(50vh - 240px - 54px); 
+            top: calc(50vh - 240px - 54px);
             left: 0;
             width: 100%;
             height: 3px;
@@ -57,10 +51,9 @@
             box-shadow: 0 0 20px rgba(99,102,241,.18);
             animation: railGlow 5s linear infinite;
         }
-
         .cyber-train-top {
             position: absolute;
-            top: calc(50vh - 240px - 68.5px); 
+            top: calc(50vh - 240px - 68.5px);
             right: -350px;
             display: flex;
             align-items: center;
@@ -68,8 +61,6 @@
             animation: trainRunTopReverse 18s linear infinite;
             filter: drop-shadow(0 0 12px rgba(99,102,241,.45)) drop-shadow(0 0 30px rgba(99,102,241,.25));
         }
-
-        /* --- BOTTOM TRAIN (Left to Right - Glides in Bottom Gap) --- */
         .rail-line {
             position: absolute;
             bottom: calc(50vh - 240px - 54px);
@@ -80,10 +71,9 @@
             box-shadow: 0 0 20px rgba(99,102,241,.18);
             animation: railGlow 5s linear infinite;
         }
-
         .cyber-train {
             position: absolute;
-            bottom: calc(50vh - 240px - 68.5px); 
+            bottom: calc(50vh - 240px - 68.5px);
             left: -350px;
             display: flex;
             align-items: center;
@@ -92,76 +82,46 @@
             filter: drop-shadow(0 0 12px rgba(99,102,241,.45)) drop-shadow(0 0 30px rgba(99,102,241,.25));
         }
 
-        /* --- TRAIN ASSETS STRUCTURE --- */
+        /* ── TRAIN PARTS ── */
         .train-engine {
-            width: 88px;
-            height: 34px;
+            width: 88px; height: 34px;
             border-radius: 16px 10px 10px 16px;
             position: relative;
             background: linear-gradient(135deg, #4f46e5, #818cf8);
             border: 1px solid rgba(255,255,255,.15);
             overflow: hidden;
         }
-
-        .cyber-train-top .train-engine {
-            border-radius: 10px 16px 16px 10px;
-        }
-
+        .cyber-train-top .train-engine { border-radius: 10px 16px 16px 10px; }
         .train-engine::before {
-            content: '';
-            position: absolute;
-            width: 22px;
-            height: 11px;
-            border-radius: 4px;
-            top: 8px;
-            left: 12px;
+            content: ''; position: absolute;
+            width: 22px; height: 11px; border-radius: 4px;
+            top: 8px; left: 12px;
             background: rgba(255,255,255,.85);
             box-shadow: 0 0 10px rgba(255,255,255,.5);
         }
-        
-        .cyber-train-top .train-engine::before {
-            left: auto;
-            right: 12px;
-        }
-
+        .cyber-train-top .train-engine::before { left: auto; right: 12px; }
         .train-engine::after {
-            content: '';
-            position: absolute;
-            width: 14px;
-            height: 14px;
-            border-radius: 50%;
-            right: -4px;
-            top: 10px;
+            content: ''; position: absolute;
+            width: 14px; height: 14px; border-radius: 50%;
+            right: -4px; top: 10px;
             background: white;
             box-shadow: 0 0 15px white, 0 0 40px rgba(255,255,255,.8), 0 0 80px rgba(99,102,241,.45);
         }
-
-        .cyber-train-top .train-engine::after {
-            right: auto;
-            left: -4px;
-        }
-
+        .cyber-train-top .train-engine::after { right: auto; left: -4px; }
         .train-coach {
-            width: 72px;
-            height: 28px;
-            border-radius: 999px;
+            width: 72px; height: 28px; border-radius: 999px;
             position: relative;
             background: linear-gradient(90deg, rgba(79,70,229,.9), rgba(129,140,248,.8));
             border: 1px solid rgba(255,255,255,.15);
             overflow: hidden;
         }
-
         .train-coach::before {
-            content: '';
-            position: absolute;
-            inset: 6px 10px;
-            border-radius: 999px;
+            content: ''; position: absolute;
+            inset: 6px 10px; border-radius: 999px;
             background: repeating-linear-gradient(90deg, rgba(255,255,255,.78) 0 8px, transparent 8px 14px);
         }
-        
-        /* =========================================
-           CARD & PANEL LAYOUTS
-        ========================================= */
+
+        /* ── CARD ── */
         .card {
             width: 100%;
             max-width: 840px;
@@ -171,17 +131,18 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             overflow: hidden;
-            min-height: 480px; 
+            min-height: 480px;
             border: 1px solid #e2e8f0;
             position: relative;
-            z-index: 10; 
+            z-index: 10;
             transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .card:hover {
             transform: translateY(-4px);
             box-shadow: 0 12px 20px -3px rgba(0,0,0,.03), 0 35px 70px -10px rgba(79, 70, 229, 0.16);
         }
-        
+
+        /* ── LEFT PANEL ── */
         .left-panel {
             background: linear-gradient(135deg, #4f46e5 0%, #312e81 100%);
             padding: 2.2rem 2rem;
@@ -191,439 +152,152 @@
             position: relative;
             overflow: hidden;
         }
-        
         .glow-orb-1 {
-            position: absolute;
-            width: 250px;
-            height: 250px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(129, 140, 248, 0.35) 0%, rgba(99, 102, 241, 0) 70%);
-            top: 15%;
-            left: -10%;
-            mix-blend-mode: plus-lighter;
+            position: absolute; width: 250px; height: 250px; border-radius: 50%;
+            background: radial-gradient(circle, rgba(129,140,248,.35) 0%, rgba(99,102,241,0) 70%);
+            top: 15%; left: -10%; mix-blend-mode: plus-lighter;
             animation: orbFloatOne 8s ease-in-out infinite alternate;
-            pointer-events: none;
-            z-index: 0;
+            pointer-events: none; z-index: 0;
         }
         .glow-orb-2 {
-            position: absolute;
-            width: 300px;
-            height: 300px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(168, 85, 247, 0.3) 0%, rgba(139, 92, 246, 0) 70%);
-            bottom: 5%;
-            right: -20%;
-            mix-blend-mode: plus-lighter;
+            position: absolute; width: 300px; height: 300px; border-radius: 50%;
+            background: radial-gradient(circle, rgba(168,85,247,.3) 0%, rgba(139,92,246,0) 70%);
+            bottom: 5%; right: -20%; mix-blend-mode: plus-lighter;
             animation: orbFloatTwo 10s ease-in-out infinite alternate;
-            pointer-events: none;
-            z-index: 0;
+            pointer-events: none; z-index: 0;
         }
-
         .brand-box {
             background: #ffffff;
-            padding: 0.75rem 1.1rem;
+            padding: .75rem 1.1rem;
             border-radius: 12px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,.15), 0 8px 10px -6px rgba(0,0,0,.1);
             align-self: flex-start;
-            position: relative;
-            z-index: 2;
+            position: relative; z-index: 2;
         }
-        .brand-name {
-            font-size: 1.1rem;
-            font-weight: 800;
-            color: #0f172a;
-            letter-spacing: -.025em;
-        }
-        .brand-tagline {
-            font-size: .65rem;
-            color: #475569;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: .1em;
-            margin-top: .12rem;
-        }
-        .brand-lockup {
-            display: flex;
-            align-items: center;
-            gap: .75rem;
-        }
-        .brand-lockup svg {
-            width: 36px;
-            height: 36px;
-            border-radius: 8px;
-            flex-shrink: 0;
-            box-shadow: 0 2px 12px rgba(37, 99, 235, 0.25);
-        }
-        
+        .brand-name { font-size: 1.1rem; font-weight: 800; color: #0f172a; letter-spacing: -.025em; }
+        .brand-tagline { font-size: .65rem; color: #475569; font-weight: 600; text-transform: uppercase; letter-spacing: .1em; margin-top: .12rem; }
+        .brand-lockup { display: flex; align-items: center; gap: .75rem; }
+        .brand-lockup svg { width: 36px; height: 36px; border-radius: 8px; flex-shrink: 0; box-shadow: 0 2px 12px rgba(37,99,235,.25); }
         .illustration-wrap {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            z-index: 2;
-            padding: 1rem 0;
+            flex: 1; display: flex; align-items: center; justify-content: center;
+            position: relative; z-index: 2; padding: 1rem 0;
             animation: smoothFloat 4s ease-in-out infinite;
         }
+        .left-bottom { position: relative; z-index: 2; }
+        .left-bottom h2 { font-size: 1.35rem; font-weight: 800; color: #ffffff; line-height: 1.3; margin-bottom: .4rem; }
+        .left-bottom p { font-size: .8rem; color: rgba(255,255,255,.7); line-height: 1.45; }
 
-        .left-bottom {
-            position: relative;
-            z-index: 2;
-        }
-        .left-bottom h2 {
-            font-size: 1.35rem;
-            font-weight: 800;
-            color: #ffffff;
-            line-height: 1.3;
-            margin-bottom: .4rem;
-        }
-        .left-bottom p {
-            font-size: .8rem;
-            color: rgba(255,255,255,.7);
-            line-height: 1.45;
-        }
-
-        /* RIGHT PANEL */
+        /* ── RIGHT PANEL ── */
         .right-panel {
             padding: 2.5rem 2.25rem;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
+            display: flex; flex-direction: column; justify-content: center;
         }
-        .right-panel h1 {
-            font-size: 1.5rem;
-            font-weight: 800;
-            color: #0f172a;
-            letter-spacing: -.03em;
-            margin-bottom: .3rem;
-        }
-        .right-panel .subtitle {
-            font-size: .82rem;
-            color: #64748b;
-            margin-bottom: 1.75rem;
-        }
-        .field-group {
-            display: flex;
-            flex-direction: column;
-            gap: 1.15rem;
-            margin-bottom: 1.5rem;
-        }
-        .field {
-            display: flex;
-            flex-direction: column;
-            gap: .4rem;
-        }
-        .field label {
-            font-size: .7rem;
-            font-weight: 700;
-            color: #475569;
-            text-transform: uppercase;
-            letter-spacing: .08em;
-        }
-        .input-wrap {
-            position: relative;
-        }
+        .right-panel h1 { font-size: 1.5rem; font-weight: 800; color: #0f172a; letter-spacing: -.03em; margin-bottom: .3rem; }
+        .right-panel .subtitle { font-size: .82rem; color: #64748b; margin-bottom: 1.75rem; }
+        .field-group { display: flex; flex-direction: column; gap: 1.15rem; margin-bottom: 1.5rem; }
+        .field { display: flex; flex-direction: column; gap: .4rem; }
+        .field label { font-size: .7rem; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: .08em; }
+        .input-wrap { position: relative; }
         .input-wrap input {
-            width: 100%;
-            padding: .7rem .95rem;
-            border: 1.5px solid #e2e8f0;
-            border-radius: 10px;
-            background: #f8fafc;
-            color: #0f172a;
-            font-size: .88rem;
-            font-family: inherit;
+            width: 100%; padding: .7rem .95rem;
+            border: 1.5px solid #e2e8f0; border-radius: 10px;
+            background: #f8fafc; color: #0f172a;
+            font-size: .88rem; font-family: inherit;
             transition: border-color .15s, box-shadow .15s, background .15s;
+            min-height: 44px;
         }
-        .input-wrap input:focus {
-            outline: none;
-            border-color: #6366f1;
-            background: #fff;
-            box-shadow: 0 0 0 3px rgba(99,102,241,.12);
-        }
-        .input-wrap input::placeholder {
-            color: #94a3b8;
-        }
+        .input-wrap input:focus { outline: none; border-color: #6366f1; background: #fff; box-shadow: 0 0 0 3px rgba(99,102,241,.12); }
+        .input-wrap input::placeholder { color: #94a3b8; }
         .eye-btn {
-            position: absolute;
-            right: .85rem;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: #94a3b8;
-            padding: .2rem;
-            display: flex;
-            align-items: center;
-            transition: color .15s;
+            position: absolute; right: .85rem; top: 50%; transform: translateY(-50%);
+            background: none; border: none; cursor: pointer; color: #94a3b8; padding: .2rem;
+            display: flex; align-items: center; transition: color .15s;
         }
         .eye-btn:hover { color: #6366f1; }
         .submit-btn {
-            width: 100%;
-            padding: .78rem;
-            background: #4f46e5;
-            color: #fff;
-            font-size: .9rem;
-            font-weight: 700;
-            font-family: inherit;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
+            width: 100%; padding: .78rem; background: #4f46e5; color: #fff;
+            font-size: .9rem; font-weight: 700; font-family: inherit; border: none;
+            border-radius: 10px; cursor: pointer; letter-spacing: .01em;
             transition: background .15s, transform .1s, box-shadow .15s;
-            letter-spacing: .01em;
+            min-height: 44px;
         }
-        .submit-btn:hover {
-            background: #4338ca;
-            box-shadow: 0 4px 16px rgba(79,70,229,.3);
-            transform: translateY(-1px);
-        }
+        .submit-btn:hover { background: #4338ca; box-shadow: 0 4px 16px rgba(79,70,229,.3); transform: translateY(-1px); }
         .submit-btn:active { transform: translateY(0); }
         .error-box {
-            background: #fef2f2;
-            border: 1px solid #fecaca;
-            color: #991b1b;
-            border-radius: 10px;
-            padding: .75rem 1rem;
-            font-size: .82rem;
-            font-weight: 500;
-            margin-bottom: 1.25rem;
+            background: #fef2f2; border: 1px solid #fecaca; color: #991b1b;
+            border-radius: 10px; padding: .75rem 1rem; font-size: .82rem;
+            font-weight: 500; margin-bottom: 1.25rem;
         }
-        .footer-note {
-            margin-top: 1.5rem;
-            text-align: center;
-            font-size: .7rem;
-            color: #94a3b8;
-            letter-spacing: .02em;
-        }
+        .footer-note { margin-top: 1.5rem; text-align: center; font-size: .7rem; color: #94a3b8; letter-spacing: .02em; }
 
-        /* =========================================
-           ANIMATION KEYFRAMES
-        ========================================= */
-        @keyframes trainRun {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(calc(100vw + 500px)); }
-        }
-        @keyframes trainRunReverse {
-            0% { transform: translateX(calc(100vw + 700px)); }
-            100% { transform: translateX(-100px); }
-        }
-        @keyframes trainRunTopReverse {
-            0%   { transform: translateX(0); }
-            100% { transform: translateX(calc(-100vw - 700px)); }
-        }
-        @keyframes railGlow {
-            0% { opacity: .25; }
-            50% { opacity: .7; }
-            100% { opacity: .25; }
-        }
-        @keyframes orbFloatOne {
-            0% { transform: translate(0, 0) scale(1); }
-            100% { transform: translate(30px, 25px) scale(1.1); }
-        }
-        @keyframes orbFloatTwo {
-            0% { transform: translate(0, 0) scale(1); }
-            100% { transform: translate(-40px, -30px) scale(0.95); }
-        }
-        @keyframes smoothFloat {
-            0% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-            100% { transform: translateY(0); }
-        }
+        /* ── ANIMATIONS ── */
+        @keyframes trainRun { 0% { transform: translateX(0); } 100% { transform: translateX(calc(100vw + 500px)); } }
+        @keyframes trainRunTopReverse { 0% { transform: translateX(0); } 100% { transform: translateX(calc(-100vw - 700px)); } }
+        @keyframes railGlow { 0% { opacity: .25; } 50% { opacity: .7; } 100% { opacity: .25; } }
+        @keyframes orbFloatOne { 0% { transform: translate(0,0) scale(1); } 100% { transform: translate(30px,25px) scale(1.1); } }
+        @keyframes orbFloatTwo { 0% { transform: translate(0,0) scale(1); } 100% { transform: translate(-40px,-30px) scale(.95); } }
+        @keyframes smoothFloat { 0% { transform: translateY(0); } 50% { transform: translateY(-10px); } 100% { transform: translateY(0); } }
 
-        /* =========================================
-           MOBILE: ACCESS DENIED SCREEN (≤640px)
-           Desktop styles above are completely untouched.
-        ========================================= */
-
-        /* Hide the login card on mobile */
-        @media (max-width: 640px) {
-            .card { display: none; }
-        }
-
-        /* Mobile-only access denied overlay — hidden on desktop */
-        .mobile-block {
-            display: none;
-        }
-
-        @media (max-width: 640px) {
-            /* Re-enable train animations on mobile */
-            .rail-line-top,
-            .cyber-train-top,
-            .rail-line,
-            .cyber-train {
-                display: flex !important;
+        /* ══════════════════════════════════════════
+           PHASE 3 — MOBILE LOGIN
+           Card stacks to single column.
+           Left panel shrinks but stays visible
+           (brand + train animation intact per spec).
+        ══════════════════════════════════════════ */
+        @media (max-width: 768px) {
+            .page {
+                padding: 1rem;
+                align-items: flex-start;
+                min-height: 100vh;
             }
 
-            /* Reposition trains to frame the mobile block card */
+            /* Stack card to single column */
+            .card {
+                grid-template-columns: 1fr;
+                min-height: auto;
+                border-radius: 16px;
+                /* Give it breathing room so trains don't overlap */
+                margin: 80px 0 80px;
+            }
+            .card:hover { transform: none; }
+
+            /* Left panel: compact banner strip showing brand + mini train space */
+            .left-panel {
+                padding: 1.5rem 1.5rem 1.25rem;
+                /* Fixed shorter height — just enough for brand + tagline */
+                min-height: 0;
+                justify-content: center;
+                gap: 0;
+            }
+
+            /* Hide the floating illustration & bottom copy to keep it tight */
+            .illustration-wrap { display: none; }
+            .left-bottom { display: none; }
+            .glow-orb-1, .glow-orb-2 { display: none; }
+
+            /* Brand box stays, centred */
+            .brand-box {
+                align-self: center;
+                text-align: left;
+            }
+
+            /* Right panel: comfortable mobile padding */
+            .right-panel {
+                padding: 1.75rem 1.5rem 2rem;
+            }
+
+            /* Trains: reposition to frame the stacked card */
             .rail-line-top {
-                top: calc(50vh - 210px - 54px);
+                top: 60px;
             }
             .cyber-train-top {
-                top: calc(50vh - 210px - 68.5px);
+                top: 46px;
             }
             .rail-line {
-                bottom: calc(50vh - 210px - 54px);
+                bottom: 60px;
             }
             .cyber-train {
-                bottom: calc(50vh - 210px - 68.5px);
-            }
-
-            /* Show the access denied card */
-            .mobile-block {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                text-align: center;
-                width: calc(100% - 2rem);
-                max-width: 340px;
-                background: #ffffff;
-                border: 1px solid #e2e8f0;
-                border-radius: 20px;
-                padding: 2.5rem 2rem;
-                position: relative;
-                z-index: 10;
-                box-shadow: 0 4px 6px -1px rgba(0,0,0,.04), 0 20px 60px -12px rgba(99,102,241,.12);
-            }
-
-            /* Shield / lock icon container */
-            .mobile-block-icon {
-                width: 72px;
-                height: 72px;
-                border-radius: 50%;
-                background: linear-gradient(135deg, #4f46e5 0%, #312e81 100%);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                margin-bottom: 1.5rem;
-                box-shadow: 0 8px 24px rgba(79,70,229,.35);
-                flex-shrink: 0;
-            }
-
-            .mobile-block-badge {
-                display: inline-flex;
-                align-items: center;
-                gap: 0.35rem;
-                background: #fef2f2;
-                border: 1px solid #fecaca;
-                border-radius: 999px;
-                padding: 0.3rem 0.85rem;
-                font-size: 0.65rem;
-                font-weight: 700;
-                color: #991b1b;
-                text-transform: uppercase;
-                letter-spacing: 0.1em;
-                margin-bottom: 1rem;
-            }
-
-            .mobile-block-badge-dot {
-                width: 6px;
-                height: 6px;
-                border-radius: 50%;
-                background: #ef4444;
-                flex-shrink: 0;
-                animation: mobilePulse 1.5s ease-in-out infinite;
-            }
-
-            .mobile-block h2 {
-                font-size: 1.45rem;
-                font-weight: 800;
-                color: #0f172a;
-                letter-spacing: -0.03em;
-                line-height: 1.25;
-                margin-bottom: 0.75rem;
-            }
-
-            .mobile-block p {
-                font-size: 0.82rem;
-                color: #64748b;
-                line-height: 1.55;
-                margin-bottom: 1.75rem;
-            }
-
-            /* Desktop illustration hint */
-            .mobile-block-devices {
-                display: flex;
-                align-items: flex-end;
-                justify-content: center;
-                gap: 0.75rem;
-                margin-bottom: 1.75rem;
-            }
-
-            /* Laptop shape */
-            .device-laptop {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                gap: 2px;
-            }
-            .device-laptop-screen {
-                width: 54px;
-                height: 36px;
-                border-radius: 4px 4px 0 0;
-                background: linear-gradient(135deg, #4f46e5, #818cf8);
-                border: 2px solid #312e81;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
-            .device-laptop-base {
-                width: 64px;
-                height: 5px;
-                background: #cbd5e1;
-                border-radius: 0 0 3px 3px;
-            }
-
-            /* Monitor shape */
-            .device-monitor {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                gap: 2px;
-            }
-            .device-monitor-screen {
-                width: 62px;
-                height: 44px;
-                border-radius: 4px;
-                background: linear-gradient(135deg, #4f46e5, #818cf8);
-                border: 2px solid #312e81;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
-            .device-monitor-stand {
-                width: 6px;
-                height: 10px;
-                background: #94a3b8;
-            }
-            .device-monitor-base {
-                width: 24px;
-                height: 4px;
-                background: #cbd5e1;
-                border-radius: 2px;
-            }
-
-            .device-screen-dot {
-                width: 8px;
-                height: 8px;
-                border-radius: 50%;
-                background: rgba(255,255,255,0.9);
-                box-shadow: 0 0 8px rgba(255,255,255,.7);
-            }
-
-            .mobile-block-footer {
-                font-size: 0.65rem;
-                color: #94a3b8;
-                letter-spacing: 0.04em;
-                border-top: 1px solid #f1f5f9;
-                padding-top: 1.25rem;
-                width: 100%;
-                text-align: center;
-            }
-
-            @keyframes mobilePulse {
-                0%, 100% { opacity: 1; transform: scale(1); }
-                50% { opacity: 0.4; transform: scale(0.8); }
+                bottom: 46px;
             }
         }
     </style>
@@ -639,7 +313,6 @@
             <div class="train-coach"></div>
             <div class="train-coach"></div>
         </div>
-
         <div class="rail-line"></div>
         <div class="cyber-train">
             <div class="train-coach"></div>
@@ -649,67 +322,8 @@
         </div>
     </div>
 
-    <!-- =============================================
-         MOBILE ACCESS DENIED BLOCK (hidden on desktop)
-    ============================================= -->
-    <div class="mobile-block" aria-label="Access restricted to desktop devices">
-
-        <!-- Brand lockup -->
-        <div style="display:flex;align-items:center;gap:.65rem;margin-bottom:1.75rem;">
-            <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:36px;height:36px;border-radius:8px;flex-shrink:0;box-shadow:0 2px 12px rgba(37,99,235,.25);">
-              <rect width="64" height="64" rx="16" fill="#2563eb"/>
-              <path d="M18 46V18h15c3.5 0 6.2.9 8 2.7 1.8 1.7 2.7 3.8 2.7 6.3 0 1.7-.5 3.2-1.5 4.4-.9 1.1-2 1.8-3.2 2.2 1.7.3 3 1.2 4 2.5 1 1.3 1.5 2.9 1.5 4.8 0 2.9-1 5.1-3 6.7-2 1.6-4.8 2.4-8.5 2.4H18zm6.2-17h8.3c1.9 0 3.3-.5 4.2-1.3.9-.8 1.4-1.9 1.4-3.2 0-1.4-.5-2.5-1.4-3.2-.9-.8-2.3-1.2-4.1-1.2h-8.4v8.9zm0 12h9.2c2 0 3.5-.5 4.5-1.5 1-.9 1.5-2.2 1.5-3.7s-.5-2.8-1.5-3.7c-1-1-2.5-1.4-4.5-1.4h-9.2v10.3z" fill="white"/>
-            </svg>
-            <div>
-                <div style="font-size:1.05rem;font-weight:800;color:#0f172a;letter-spacing:-.025em;">bputnotes.in</div>
-                <div style="font-size:.6rem;color:#475569;font-weight:600;text-transform:uppercase;letter-spacing:.1em;margin-top:.1rem;">Management Workspace</div>
-            </div>
-        </div>
-
-        <div class="mobile-block-icon">
-            <!-- Lock icon -->
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-            </svg>
-        </div>
-
-        <div class="mobile-block-badge">
-            <span class="mobile-block-badge-dot"></span>
-            Access Denied
-        </div>
-
-        <h2>Desktop &amp;<br>Laptop Only</h2>
-
-        <p>This workspace is restricted to desktop and laptop devices. Please switch to a laptop or desktop computer to sign in.</p>
-
-        <div class="mobile-block-devices">
-            <!-- Laptop -->
-            <div class="device-laptop">
-                <div class="device-laptop-screen">
-                    <div class="device-screen-dot"></div>
-                </div>
-                <div class="device-laptop-base"></div>
-            </div>
-            <!-- Monitor -->
-            <div class="device-monitor">
-                <div class="device-monitor-screen">
-                    <div class="device-screen-dot"></div>
-                </div>
-                <div class="device-monitor-stand"></div>
-                <div class="device-monitor-base"></div>
-            </div>
-        </div>
-
-        <div class="mobile-block-footer">
-            bputnotes.in &mdash; Authorised Personnel Only
-        </div>
-    </div>
-
-    <!-- =============================================
-         LOGIN CARD (hidden on mobile via CSS)
-    ============================================= -->
     <div class="card">
+        <!-- LEFT PANEL — brand always visible; illustration hidden on mobile -->
         <div class="left-panel">
             <div class="glow-orb-1"></div>
             <div class="glow-orb-2"></div>
@@ -742,17 +356,6 @@
                     <rect x="192" y="130" width="12" height="30" rx="2" fill="rgba(255,255,255,0.45)"/>
                     <rect x="208" y="120" width="12" height="40" rx="2" fill="rgba(255,255,255,0.6)"/>
                     <rect x="224" y="110" width="12" height="50" rx="2" fill="rgba(255,255,255,0.5)"/>
-                    <rect x="95" y="210" width="130" height="22" rx="5" fill="rgba(255,255,255,0.18)"/>
-                    <rect x="102" y="215" width="14" height="7" rx="2" fill="rgba(255,255,255,0.3)"/>
-                    <rect x="120" y="215" width="14" height="7" rx="2" fill="rgba(255,255,255,0.3)"/>
-                    <rect x="138" y="215" width="14" height="7" rx="2" fill="rgba(255,255,255,0.3)"/>
-                    <rect x="156" y="215" width="14" height="7" rx="2" fill="rgba(255,255,255,0.3)"/>
-                    <rect x="174" y="215" width="14" height="7" rx="2" fill="rgba(255,255,255,0.3)"/>
-                    <rect x="107" y="226" width="106" height="4" rx="2" fill="rgba(255,255,255,0.2)"/>
-                    <rect x="258" y="185" width="26" height="18" rx="4" fill="rgba(255,255,255,0.2)"/>
-                    <path d="M284 191 Q294 191 294 197 Q294 203 284 203" stroke="rgba(255,255,255,0.3)" stroke-width="2" fill="none"/>
-                    <path d="M264 182 Q266 177 264 172" stroke="rgba(255,255,255,0.35)" stroke-width="1.5" stroke-linecap="round" fill="none"/>
-                    <path d="M271 180 Q273 174 271 169" stroke="rgba(255,255,255,0.35)" stroke-width="1.5" stroke-linecap="round" fill="none"/>
                     <circle cx="160" cy="42" r="18" fill="rgba(255,255,255,0.2)"/>
                     <path d="M130 80 Q135 55 160 55 Q185 55 190 80" fill="rgba(255,255,255,0.15)"/>
                     <rect x="14" y="110" width="60" height="28" rx="8" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
@@ -764,12 +367,14 @@
                     <path d="M282 68 L285 72 L291 65" stroke="rgba(255,255,255,0.8)" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
                 </svg>
             </div>
+
             <div class="left-bottom">
                 <h2>Your workspace,<br>ready when you are.</h2>
                 <p>Track tasks, manage attendance, and stay in sync with your team - all in one place.</p>
             </div>
         </div>
 
+        <!-- RIGHT PANEL — sign-in form -->
         <div class="right-panel">
             <h1>Sign in</h1>
             <p class="subtitle">Use your assigned username or Intern ID to continue.</p>
@@ -790,7 +395,7 @@
                                 type="text"
                                 name="{{ form.username.html_name }}"
                                 id="{{ form.username.id_for_label }}"
-                                placeholder="e.g. admin or BPUT-2026-0001"
+                                placeholder="e.g. admin or CNT-INTERN-..."
                                 autocomplete="username"
                                 value="{{ form.username.value|default:'' }}"
                             >
@@ -808,8 +413,7 @@
                             >
                             <button type="button" class="eye-btn" onclick="togglePassword()" aria-label="Toggle password visibility" id="eye-btn">
                                 <svg id="eye-open" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                                    <circle cx="12" cy="12" r="3"/>
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
                                 </svg>
                                 <svg id="eye-closed" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
                                     <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>
@@ -831,15 +435,10 @@ function togglePassword() {
     const open = document.getElementById('eye-open');
     const closed = document.getElementById('eye-closed');
     if (!field) return;
-    
     if (field.type === 'password') {
-        field.type = 'text';
-        open.style.display = 'none';
-        closed.style.display = '';
+        field.type = 'text'; open.style.display = 'none'; closed.style.display = '';
     } else {
-        field.type = 'password';
-        open.style.display = '';
-        closed.style.display = 'none';
+        field.type = 'password'; open.style.display = ''; closed.style.display = 'none';
     }
 }
 </script>

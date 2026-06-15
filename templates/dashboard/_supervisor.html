@@ -29,7 +29,7 @@
                 </div>
                 <a href="{{ item.submission_link }}" target="_blank" rel="noopener" class="btn-outline" style="white-space:nowrap;">{{ link_label }} ↗</a>
             </div>
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-top:1.25rem; border:1px solid #e2e8f0; padding-top:1.25rem;">
+            <div class="split-2" style="margin-top:1.25rem; border-top:1px solid #e2e8f0; padding-top:1.25rem;">
                 <form method="post" action="{% url 'review-submission' item.token_id 'approve' %}">
                     {% csrf_token %}
                     <textarea name="remark" rows="2" placeholder="{{ remark_placeholder }}" style="font-size:.82rem; margin-bottom:.6rem;"></textarea>
