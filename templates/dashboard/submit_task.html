@@ -36,7 +36,7 @@
                 {% if field.errors %}<p style="color:#e11d48; font-size:.75rem; margin-top:.3rem;">{{ field.errors.0 }}</p>{% endif %}
             </div>
             {% endfor %}
-            <div style="display:flex; gap:.75rem; margin-top:.5rem;">
+            <div class="form-btn-row">
                 <button type="submit" class="btn btn-primary">Submit for Review</button>
                 <a href="{% url 'intern-dashboard' %}" class="btn btn-outline" style="text-decoration:none;">Cancel</a>
             </div>

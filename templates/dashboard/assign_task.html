@@ -9,13 +9,13 @@
     <!-- Step 1: Intern Lookup -->
     <div class="card" style="margin-bottom:1.25rem;">
         <h2 class="section-title"> Step 1 — Find Intern</h2>
-        <form method="post" style="display:flex; gap:.75rem; align-items:flex-end;">
+        <form method="post" class="form-btn-row" style="align-items:flex-end;">
             {% csrf_token %}
-            <div style="flex:1;">
+            <div style="flex:1; min-width:0;">
                 <label>Intern ID</label>
                 <input type="text" name="intern_id" id="intern-id-input" value="{{ form.intern_id.value|default:'' }}" placeholder="e.g. CNT-INTERN-100626-001" style="margin-top:.4rem;">
             </div>
-            <button type="submit" name="lookup" class="btn btn-outline" style="white-space:nowrap;">Lookup</button>
+            <button type="submit" name="lookup" class="btn btn-outline" style="white-space:nowrap; flex-shrink:0;">Lookup</button>
         </form>
         {% if error_msg %}<p style="color:#e11d48; font-size:.82rem; margin-top:.75rem;"> {{ error_msg }}</p>{% endif %}
         {% if intern_preview %}
@@ -47,7 +47,7 @@
             </div>
             {% endif %}
             {% endfor %}
-            <div><button type="submit" class="btn btn-primary">Assign Task</button></div>
+            <div class="form-btn-row"><button type="submit" class="btn btn-primary">Assign Task</button></div>
         </form>
     </div>
 </div>

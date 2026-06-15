@@ -46,11 +46,11 @@
             <tbody>
                 {% for intern in attendance %}
                 <tr>
-                    <td style="font-weight:600; color:#0f172a;">{{ intern.get_full_name|default:intern.username }}</td>
-                    <td style="font-family:monospace; color:#4f46e5; font-size:.78rem;">{{ intern.intern_id|default:"—" }}</td>
-                    <td style="font-size:.8rem; color:#64748b;">{{ intern.get_department_display|default:"—" }}</td>
-                    <td style="font-size:.8rem; color:#64748b;">{{ intern.college_name|default:"—" }}</td>
-                    <td>
+                    <td data-label="Name" style="font-weight:600; color:#0f172a;">{{ intern.get_full_name|default:intern.username }}</td>
+                    <td data-label="Intern ID" style="font-family:monospace; color:#4f46e5; font-size:.78rem;">{{ intern.intern_id|default:"—" }}</td>
+                    <td data-label="Department" style="font-size:.8rem; color:#64748b;">{{ intern.get_department_display|default:"—" }}</td>
+                    <td data-label="College" style="font-size:.8rem; color:#64748b;">{{ intern.college_name|default:"—" }}</td>
+                    <td data-label="Days Present">
                         <span style="background:#f1f5f9; color:#94a3b8; padding:.2rem .6rem; border-radius:.3rem; font-size:.82rem; font-weight:600;">{{ intern.present_days }}</span>
                     </td>
                 </tr>

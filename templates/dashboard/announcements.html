@@ -29,7 +29,7 @@
     {% for ann in announcements %}
     <div class="card" style="border-left:3px solid #6366f1;">
         <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:.75rem;">
-            <div style="flex:1;">
+            <div style="flex:1; min-width:0;">
                 <div style="display:flex; align-items:center; gap:.75rem; flex-wrap:wrap; margin-bottom:.5rem;">
                     <span style="font-family:monospace; font-size:.78rem; font-weight:700; color:#4f46e5;">{{ ann.ann_id }}</span>
                     <span style="font-size:.72rem; color:#64748b;">{{ ann.created_at|date:"M d, Y  H:i" }}</span>

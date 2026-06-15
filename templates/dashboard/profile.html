@@ -5,38 +5,38 @@
 <div class="page-header">
     <div><h1> My Profile</h1><p>Update your details and change password</p></div>
 </div>
-<div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(340px,1fr)); gap:1.5rem; max-width:840px;">
+<div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr)); gap:1.5rem; max-width:840px;">
     <!-- Info Card -->
     <div class="card">
         <h2 class="section-title">🪪 Account Info</h2>
         <div style="display:flex; flex-direction:column; gap:.65rem; font-size:.88rem;">
-            <div style="display:flex; justify-content:space-between; border:1px solid #e2e8f0; padding-bottom:.5rem;">
-                <span style="color:#64748b;">Username</span>
-                <span style="color:#0f172a; font-weight:600;">{{ request.user.username }}</span>
+            <div style="display:flex; justify-content:space-between; gap:.5rem; border-bottom:1px solid #f1f5f9; padding-bottom:.5rem; flex-wrap:wrap;">
+                <span style="color:#64748b; flex-shrink:0;">Username</span>
+                <span style="color:#0f172a; font-weight:600; word-break:break-all; text-align:right;">{{ request.user.username }}</span>
             </div>
             {% if request.user.intern_id %}
-            <div style="display:flex; justify-content:space-between; border:1px solid #e2e8f0; padding-bottom:.5rem;">
-                <span style="color:#64748b;">Intern ID</span>
-                <span style="font-family:monospace; color:#4f46e5; font-weight:700;">{{ request.user.intern_id }}</span>
+            <div style="display:flex; justify-content:space-between; gap:.5rem; border-bottom:1px solid #f1f5f9; padding-bottom:.5rem; flex-wrap:wrap;">
+                <span style="color:#64748b; flex-shrink:0;">Intern ID</span>
+                <span style="font-family:monospace; color:#4f46e5; font-weight:700; word-break:break-all; text-align:right;">{{ request.user.intern_id }}</span>
             </div>
             {% endif %}
-            <div style="display:flex; justify-content:space-between; border:1px solid #e2e8f0; padding-bottom:.5rem;">
-                <span style="color:#64748b;">Role</span>
-                <span style="color:#0f172a;">{{ request.user.get_role_display }}</span>
+            <div style="display:flex; justify-content:space-between; gap:.5rem; border-bottom:1px solid #f1f5f9; padding-bottom:.5rem; flex-wrap:wrap;">
+                <span style="color:#64748b; flex-shrink:0;">Role</span>
+                <span style="color:#0f172a; text-align:right;">{{ request.user.get_role_display }}</span>
             </div>
-            <div style="display:flex; justify-content:space-between; border:1px solid #e2e8f0; padding-bottom:.5rem;">
-                <span style="color:#64748b;">Full Name</span>
-                <span style="color:#0f172a;">{{ request.user.get_full_name|default:"Not set" }}</span>
+            <div style="display:flex; justify-content:space-between; gap:.5rem; border-bottom:1px solid #f1f5f9; padding-bottom:.5rem; flex-wrap:wrap;">
+                <span style="color:#64748b; flex-shrink:0;">Full Name</span>
+                <span style="color:#0f172a; text-align:right;">{{ request.user.get_full_name|default:"Not set" }}</span>
             </div>
             {% if request.user.college_name %}
-            <div style="display:flex; justify-content:space-between; border:1px solid #e2e8f0; padding-bottom:.5rem;">
-                <span style="color:#64748b;">College</span>
-                <span style="color:#0f172a;">{{ request.user.college_name }}</span>
+            <div style="display:flex; justify-content:space-between; gap:.5rem; border-bottom:1px solid #f1f5f9; padding-bottom:.5rem; flex-wrap:wrap;">
+                <span style="color:#64748b; flex-shrink:0;">College</span>
+                <span style="color:#0f172a; text-align:right;">{{ request.user.college_name }}</span>
             </div>
             {% endif %}
-            <div style="display:flex; justify-content:space-between;">
-                <span style="color:#64748b;">Joined</span>
-                <span style="color:#0f172a;">{{ request.user.date_of_joining|date:"M d, Y" }}</span>
+            <div style="display:flex; justify-content:space-between; gap:.5rem; flex-wrap:wrap;">
+                <span style="color:#64748b; flex-shrink:0;">Joined</span>
+                <span style="color:#0f172a; text-align:right;">{{ request.user.date_of_joining|date:"M d, Y" }}</span>
             </div>
         </div>
 

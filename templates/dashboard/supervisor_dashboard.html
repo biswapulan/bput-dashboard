@@ -11,7 +11,7 @@
 </div>
 
 <!-- Tabs -->
-<div style="display:flex; gap:.6rem; margin-bottom:1.75rem; border:1px solid #e2e8f0; padding-bottom:1rem; flex-wrap:wrap;">
+<div class="tab-bar-scroll" style="display:flex; gap:.6rem; margin-bottom:1.75rem; border-bottom:1px solid #e2e8f0; padding-bottom:1rem;">
     <button class="tab-btn active" data-tab="tasks"> Active Tasks ({{ tasks|length }})</button>
     <button class="tab-btn" data-tab="interns"> My Interns ({{ interns|length }})</button>
     <button class="tab-btn" data-tab="tickets"> Open Tickets ({{ tickets|length }})</button>
@@ -52,7 +52,7 @@
                 </div>
 
                 {% if task.status == "SUBMITTED" %}
-                <div style="display:flex; flex-direction:column; gap:.6rem; min-width:240px;">
+                <div class="sv-action-panel" style="display:flex; flex-direction:column; gap:.6rem; width:100%; max-width:280px;">
                     {% with task.submission as sub %}
                     {% if sub %}
                     <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:.5rem; padding:.85rem;">

@@ -5,25 +5,25 @@
 <div class="page-header">
     <div><h1> Archive</h1><p>Completed tasks and resolved tickets</p></div>
 </div>
-<div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(420px,1fr)); gap:1.5rem;">
+<div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,400px),1fr)); gap:1.5rem;">
     <div class="card">
         <h2 class="section-title"> Accepted Tasks</h2>
         <div style="overflow-x:auto;">
             <table class="data-table">
-                <thead><tr><th>Task ID</th><th>Intern</th><th>Title</th><th>Accepted</th></tr></thead>
+                <thead><tr><th>Task ID</th><th>Assigned To</th><th>Title</th><th>Accepted</th></tr></thead>
                 <tbody>
                     {% for task in tasks %}
                     <tr>
                         <td data-label="Task ID" style="font-family:monospace; color:#059669; font-size:.78rem; white-space:nowrap;">{{ task.task_id }}</td>
-                        <td data-label="Title">
+                        <td data-label="Assigned To">
                             <span style="font-size:.82rem; font-weight:500; color:#0f172a;">{{ task.assigned_to.get_full_name|default:task.assigned_to.username }}</span>
                             <br><span style="font-size:.7rem; color:#4f46e5; font-family:monospace;">{{ task.assigned_to.intern_id|default:"—" }}</span>
                         </td>
-                        <td data-label="Assigned To" style="font-size:.82rem; color:#334155;">{{ task.title }}</td>
-                        <td data-label="Assigned By" style="font-size:.75rem; color:#64748b; white-space:nowrap;">{{ task.updated_at|date:"M d, Y" }}</td>
+                        <td data-label="Title" style="font-size:.82rem; color:#334155;">{{ task.title }}</td>
+                        <td data-label="Accepted" style="font-size:.75rem; color:#64748b; white-space:nowrap;">{{ task.updated_at|date:"M d, Y" }}</td>
                     </tr>
                     {% empty %}
-                    <tr><td data-label="Status" colspan="4" style="color:#334155; font-style:italic; text-align:center; padding:2rem;">No accepted tasks yet.</td></tr>
+                    <tr><td colspan="4" style="color:#334155; font-style:italic; text-align:center; padding:2rem;">No accepted tasks yet.</td></tr>
                     {% endfor %}
                 </tbody>
             </table>
@@ -37,15 +37,15 @@
                 <tbody>
                     {% for ticket in tickets %}
                     <tr>
-                        <td data-label="Date" style="font-family:monospace; color:#e11d48; font-size:.78rem; white-space:nowrap;">{{ ticket.token_id }}</td>
-                        <td data-label="Token ID">
+                        <td data-label="Token" style="font-family:monospace; color:#e11d48; font-size:.78rem; white-space:nowrap;">{{ ticket.token_id }}</td>
+                        <td data-label="Raised By">
                             <span style="font-size:.82rem; font-weight:500; color:#0f172a;">{{ ticket.raised_by.get_full_name|default:ticket.raised_by.username }}</span>
                             <br><span style="font-size:.7rem; color:#4f46e5; font-family:monospace;">{{ ticket.raised_by.intern_id|default:"—" }}</span>
                         </td>
                         <td data-label="Subject" style="font-size:.82rem; color:#334155;">{{ ticket.subject }}</td>
                     </tr>
                     {% empty %}
-                    <tr><td data-label="Raised By" colspan="3" style="color:#334155; font-style:italic; text-align:center; padding:2rem;">No resolved tickets.</td></tr>
+                    <tr><td colspan="3" style="color:#334155; font-style:italic; text-align:center; padding:2rem;">No resolved tickets.</td></tr>
                     {% endfor %}
                 </tbody>
             </table>

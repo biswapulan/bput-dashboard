@@ -211,6 +211,10 @@
         /* ── STAT CARDS ── */
         .stat-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 1.25rem 1.5rem; }
 
+        /* ── BTN CONTAINER (shared base) ── */
+        .btn-container { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .form-btn-row  { display: flex; align-items: center; gap: .75rem; margin-top: .5rem; flex-wrap: wrap; }
+
         /* ── TABS ── */
         .tab-btn {
             padding: .48rem 1.15rem;
@@ -520,6 +524,86 @@
 
             /* Overflow-x wrapper for any remaining tables */
             .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+            /* ── Phase 5: Buttons → full-width stacked ── */
+            .btn-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .btn-container .btn,
+            .btn-container a.btn,
+            .btn-container button {
+                width: 100%;
+                text-align: center;
+                justify-content: center;
+            }
+
+            /* Generic inline button pairs (submit + cancel pattern) */
+            .form-btn-row {
+                flex-direction: column;
+                align-items: stretch;
+                gap: .6rem !important;
+            }
+            .form-btn-row .btn,
+            .form-btn-row a.btn {
+                width: 100%;
+                text-align: center;
+            }
+
+            /* ── Phase 5: Inputs / selects / textareas touch sizing ── */
+            input[type=text],
+            input[type=email],
+            input[type=password],
+            input[type=date],
+            input[type=number],
+            input[type=url],
+            select,
+            textarea {
+                padding: .75rem .85rem;
+                min-height: 44px;
+                font-size: 16px; /* prevents iOS auto-zoom */
+            }
+
+            /* ── Phase 5: Tab bars → horizontal scroll ── */
+            .tab-bar-scroll {
+                display: flex !important;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+                flex-wrap: nowrap !important;
+                gap: .5rem;
+                padding-bottom: .85rem;
+            }
+            .tab-bar-scroll::-webkit-scrollbar { display: none; }
+            .tab-bar-scroll .tab-btn {
+                flex-shrink: 0;
+            }
+
+            /* CMS tab bar wrapper */
+            .cms-tab-bar-wrap {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+            }
+            .cms-tab-bar-wrap::-webkit-scrollbar { display: none; }
+            .cms-tab-bar-wrap > div,
+            .cms-tab-bar-wrap > .tab-bar-scroll {
+                flex-wrap: nowrap !important;
+            }
+
+            /* ── Phase 6: Supervisor task action panel → full width ── */
+            .sv-action-panel {
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+
+            /* ── Phase 5: Hover translate-Y off on mobile (perf) ── */
+            .btn:hover { transform: none; }
+
+            /* ── Phase 5: Accordion row title wraps above badge+date ── */
+            .row-task .row-task-title {
+                grid-column: 1 / -1;
+            }
         }
     </style>
     {% block extra_head %}{% endblock %}

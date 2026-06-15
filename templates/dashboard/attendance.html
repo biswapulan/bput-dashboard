@@ -46,7 +46,7 @@
             <label style="display:block; margin-bottom:.4rem;">Search Intern</label>
             <input type="text" name="intern" value="{{ filter_intern }}" placeholder="Name, username or Intern ID…">
         </div>
-        <div style="display:flex; gap:.5rem; flex-shrink:0;">
+        <div class="form-btn-row" style="flex-shrink:0;">
             <button type="submit" class="btn btn-primary btn-sm">Apply</button>
             <a href="{% url 'admin-attendance' %}" class="btn btn-outline btn-sm" style="text-decoration:none;">Reset</a>
         </div>
@@ -79,13 +79,13 @@
             <tbody>
                 {% for log in logs %}
                 <tr>
-                    <td data-label="Intern" style="color:#4f46e5; font-weight:600; font-size:.82rem; white-space:nowrap;">{{ log.login_date|date:"M d, Y" }}</td>
-                    <td data-label="Department">
+                    <td data-label="Date" style="color:#4f46e5; font-weight:600; font-size:.82rem; white-space:nowrap;">{{ log.login_date|date:"M d, Y" }}</td>
+                    <td data-label="Intern">
                         <div style="font-weight:500; color:#0f172a;">{{ log.user.get_full_name|default:log.user.username }}</div>
                         <div style="font-size:.72rem; color:#475569;">{{ log.user.username }}</div>
                     </td>
-                    <td data-label="Date" style="font-family:monospace; color:#4f46e5; font-size:.78rem;">{{ log.user.intern_id|default:"—" }}</td>
-                    <td data-label="Login Time">
+                    <td data-label="Intern ID" style="font-family:monospace; color:#4f46e5; font-size:.78rem;">{{ log.user.intern_id|default:"—" }}</td>
+                    <td data-label="Department">
                         {% if log.user.department == "CONTENT" %}
                         <span class="badge" style="background:#eef2ff; color:#4f46e5; border:1px solid #3730a3;">Content</span>
                         {% elif log.user.department == "TECH" %}
@@ -94,13 +94,13 @@
                         <span style="color:#334155;">—</span>
                         {% endif %}
                     </td>
-                    <td data-label="Logout Time" style="font-size:.8rem; color:#64748b;">{{ log.user.college_name|default:"—"|truncatechars:30 }}</td>
-                    <td data-label="Duration" style="font-size:.8rem; color:#64748b; white-space:nowrap; font-family:monospace;">{{ log.first_login_time|date:"H:i:s" }}</td>
-                    <td data-label="Intern" style="font-size:.8rem; color:#64748b; white-space:nowrap; font-family:monospace;">{% if log.logout_time %}{{ log.logout_time|date:"H:i:s" }}{% else %}—{% endif %}</td>
+                    <td data-label="College" style="font-size:.8rem; color:#64748b;">{{ log.user.college_name|default:"—"|truncatechars:30 }}</td>
+                    <td data-label="First Login" style="font-size:.8rem; color:#64748b; white-space:nowrap; font-family:monospace;">{{ log.first_login_time|date:"H:i:s" }}</td>
+                    <td data-label="Logout" style="font-size:.8rem; color:#64748b; white-space:nowrap; font-family:monospace;">{% if log.logout_time %}{{ log.logout_time|date:"H:i:s" }}{% else %}—{% endif %}</td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td data-label="Department" colspan="7" style="text-align:center; color:#334155; font-style:italic; padding:3rem;">
+                    <td data-label="" colspan="7" style="text-align:center; color:#334155; font-style:italic; padding:3rem;">
                         {% if filter_date or filter_dept or filter_intern %}
                         No records match your filters.
                         {% else %}
