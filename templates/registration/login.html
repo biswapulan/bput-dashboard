@@ -223,6 +223,16 @@
         }
         .submit-btn:hover { background: #4338ca; box-shadow: 0 4px 16px rgba(79,70,229,.3); transform: translateY(-1px); }
         .submit-btn:active { transform: translateY(0); }
+        .submit-btn:disabled {
+            opacity: .85; cursor: not-allowed; transform: none; box-shadow: none;
+            display: flex; align-items: center; justify-content: center; gap: .55rem;
+        }
+        .btn-spinner {
+            width: 16px; height: 16px; border-radius: 50%;
+            border: 2px solid rgba(255,255,255,.35); border-top-color: #fff;
+            animation: btnSpin .7s linear infinite; flex-shrink: 0;
+        }
+        @keyframes btnSpin { to { transform: rotate(360deg); } }
         .error-box {
             background: #fef2f2; border: 1px solid #fecaca; color: #991b1b;
             border-radius: 10px; padding: .75rem 1rem; font-size: .82rem;
@@ -414,7 +424,7 @@
             </div>
             {% endif %}
 
-            <form method="post" autocomplete="on">
+            <form method="post" autocomplete="on" id="login-form" onsubmit="handleLoginSubmit()">
                 {% csrf_token %}
                 <div class="field-group">
                     <div class="field">
@@ -452,7 +462,7 @@
                     </div>
                 </div>
                 <input type="hidden" name="next" value="{{ next }}">
-                <button type="submit" class="submit-btn">Sign In</button>
+                <button type="submit" class="submit-btn" id="login-submit-btn"><span id="login-submit-label">Sign In</span></button>
             </form>
             <p class="footer-note">bputnotes.in &mdash; Authorised Personnel Only</p>
         </div>
@@ -469,6 +479,18 @@ function togglePassword() {
     } else {
         field.type = 'password'; open.style.display = ''; closed.style.display = 'none';
     }
+}
+
+// Show a loading state on the submit button while the form posts
+function handleLoginSubmit() {
+    const btn = document.getElementById('login-submit-btn');
+    const label = document.getElementById('login-submit-label');
+    if (!btn || btn.disabled) return;
+    btn.disabled = true;
+    label.textContent = 'Signing in';
+    const spinner = document.createElement('span');
+    spinner.className = 'btn-spinner';
+    btn.appendChild(spinner);
 }
 </script>
 </body>
