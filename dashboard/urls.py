@@ -27,6 +27,7 @@ urlpatterns = [
     path("dashboard/supervisor/tickets/<str:token_id>/resolve/", views.resolve_ticket, name="resolve-ticket"),
     path("dashboard/supervisor/archive/", views.supervisor_archive, name="supervisor-archive"),
     path("dashboard/supervisor/lookup-intern/", views.lookup_intern, name="lookup-intern"),
+    path("dashboard/supervisor/send-message/", views.supervisor_send_message, name="supervisor-send-message"),
 
     # Intern
     path("dashboard/intern/", views.intern_dashboard, name="intern-dashboard"),
@@ -34,6 +35,7 @@ urlpatterns = [
     path("dashboard/intern/tasks/<str:task_id>/submit/", views.submit_task, name="submit-task"),
     path("dashboard/intern/raise-ticket/", views.raise_ticket, name="raise-ticket"),
     path("dashboard/intern/cms/", views.cms_tools, name="cms-tools"),
+    path("dashboard/intern/messages/", views.intern_messages, name="intern-messages"),
 
     # Profile
     path("profile/", views.profile, name="profile"),

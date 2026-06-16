@@ -306,3 +306,42 @@ class InternAccountRead(models.Model):
         constraints = [
             models.UniqueConstraint(fields=["user", "intern"], name="unique_intern_account_read")
         ]
+
+
+class SupervisorMessage(models.Model):
+    """A personal message/announcement sent by a Content Supervisor to a specific intern."""
+    msg_id = models.CharField(max_length=30, unique=True, db_index=True, blank=True)
+    title = models.CharField(max_length=200)
+    body = models.TextField()
+    sent_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="sent_supervisor_messages"
+    )
+    sent_to = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="received_supervisor_messages"
+    )
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"{self.msg_id} — {self.title} → {self.sent_to.username}"
+
+    def save(self, *args, **kwargs):
+        if not self.msg_id:
+            self.msg_id = self._generate_msg_id()
+        super().save(*args, **kwargs)
+
+    @classmethod
+    def _generate_msg_id(cls):
+        date_part = timezone.localdate().strftime("%Y%m%d")
+        prefix = f"MSG-{date_part}-"
+        last = cls.objects.filter(msg_id__startswith=prefix).order_by("-msg_id").first()
+        next_num = 1
+        if last:
+            try:
+                next_num = int(last.msg_id.rsplit("-", 1)[1]) + 1
+            except (ValueError, IndexError):
+                pass
+        return f"{prefix}{next_num:03d}"

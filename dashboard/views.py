@@ -25,6 +25,7 @@ from .models import (
     InternAccountRead,
     Submission,
     SubmissionRead,
+    SupervisorMessage,
     TaskRead,
     Ticket,
     TicketRead,
@@ -59,6 +60,9 @@ def get_unread_counts(user):
         # Unread announcements
         read_ann_ids = AnnouncementRead.objects.filter(user=user).values_list("announcement_id", flat=True)
         counts["unread_announcements"] = Announcement.objects.exclude(id__in=read_ann_ids).count()
+
+        # Unread supervisor messages
+        counts["unread_sv_messages"] = SupervisorMessage.objects.filter(sent_to=user, is_read=False).count()
 
     if role in {CustomUser.Role.CONTENT_SUPERVISOR, CustomUser.Role.TECH_SUPERVISOR}:
         dept = "CONTENT" if role == CustomUser.Role.CONTENT_SUPERVISOR else "TECH"
@@ -473,6 +477,83 @@ def resolve_ticket(request, token_id):
         ticket.save()
         messages.success(request, "Ticket resolved.")
     return redirect("tasks")
+
+
+@role_required(CustomUser.Role.CONTENT_SUPERVISOR, CustomUser.Role.TECH_SUPERVISOR)
+def supervisor_send_message(request):
+    """Content/Tech Supervisor sends a personal announcement to ONE specific intern."""
+    user = request.user
+    intern_role = CustomUser.Role.CONTENT_INTERN if user.role == CustomUser.Role.CONTENT_SUPERVISOR else CustomUser.Role.TECH_INTERN
+    interns = CustomUser.objects.filter(role=intern_role).order_by("first_name", "username")
+
+    if request.method == "POST":
+        intern_id = request.POST.get("intern_id", "").strip()
+        title = request.POST.get("title", "").strip()
+        body = request.POST.get("body", "").strip()
+
+        errors = {}
+        target_intern = None
+
+        if not intern_id:
+            errors["intern_id"] = "Please select an intern."
+        else:
+            try:
+                target_intern = CustomUser.objects.get(pk=intern_id, role=intern_role)
+            except CustomUser.DoesNotExist:
+                errors["intern_id"] = "Invalid intern selected."
+
+        if not title:
+            errors["title"] = "Title is required."
+        if not body:
+            errors["body"] = "Message body is required."
+
+        if not errors and target_intern:
+            SupervisorMessage.objects.create(
+                title=title,
+                body=body,
+                sent_by=user,
+                sent_to=target_intern,
+            )
+            messages.success(request, f"Message sent to {target_intern.get_full_name() or target_intern.username}.")
+            return redirect("supervisor-send-message")
+
+        counts = get_unread_counts(request.user)
+        sent_messages = SupervisorMessage.objects.filter(sent_by=user).select_related("sent_to")
+        return render(request, "dashboard/supervisor_send_message.html", {
+            "interns": interns,
+            "sent_messages": sent_messages,
+            "errors": errors,
+            "prev_intern_id": intern_id,
+            "prev_title": title,
+            "prev_body": body,
+            **counts,
+        })
+
+    counts = get_unread_counts(request.user)
+    sent_messages = SupervisorMessage.objects.filter(sent_by=user).select_related("sent_to")
+    return render(request, "dashboard/supervisor_send_message.html", {
+        "interns": interns,
+        "sent_messages": sent_messages,
+        "errors": {},
+        **counts,
+    })
+
+
+@role_required(CustomUser.Role.CONTENT_INTERN, CustomUser.Role.TECH_INTERN)
+def intern_messages(request):
+    """Intern views personal messages received from their supervisor."""
+    user = request.user
+    msgs = SupervisorMessage.objects.filter(sent_to=user).select_related("sent_by")
+
+    # Mark all as read
+    SupervisorMessage.objects.filter(sent_to=user, is_read=False).update(is_read=True)
+
+    counts = get_unread_counts(request.user)
+    counts["unread_sv_messages"] = 0
+    return render(request, "dashboard/intern_messages.html", {
+        "sv_messages": msgs,
+        **counts,
+    })
 
 
 @role_required(CustomUser.Role.CONTENT_SUPERVISOR, CustomUser.Role.TECH_SUPERVISOR)
